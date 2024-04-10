@@ -7,6 +7,9 @@
 #define IDS_ABOUTBOX                    101
 #define IDD_ADTOOL_DIALOG               102
 #define IDR_MAINFRAME                   128
+#define IDD_TEMPLATE_MANAGER_DIALOG     130
+#define IDD_DIALOG1                     132
+#define IDD_GEN_IMAGE_DIALOG            132
 #define IDC_TEMPLATE_MANAGER_BTN        1000
 #define IDC_COMBO1                      1001
 #define IDC_GROUP_COMBO                 1001
@@ -144,15 +147,23 @@
 #define IDC_AD_STATIC_5                 1305
 #define IDC_AD_STATIC_6                 1306
 #define IDC_AD_STATIC_7                 1307
+#define IDC_AD_STATIC_8                 1308
+#define IDC_AD_BACKUP_1                 1309
+#define IDC_AD_BACKUP_2                 1310
+#define IDC_AD_BACKUP_3                 1311
+#define IDC_AD_BACKUP_4                 1312
+#define IDC_AD_BACKUP_5                 1313
+#define IDC_AD_BACKUP_6                 1314
+#define IDC_AD_BACKUP_7                 1315
 #define IDC_STATIC_PREVIEW              1400
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        130
+#define _APS_NEXT_RESOURCE_VALUE        134
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1401
+#define _APS_NEXT_CONTROL_VALUE         1402
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

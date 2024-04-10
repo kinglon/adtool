@@ -2,11 +2,17 @@
 #include "SettingManager.h"
 #include <json/json.h>
 #include <fstream>
-#include "Utility/ImPath.h"
-#include "Utility/ImCharset.h"
+#include "ImPath.h"
+#include "ImCharset.h"
 
 CSettingManager::CSettingManager()
 {
+    for (int i = 0; i < BACKUP_AD_COUNT; i++)
+    {
+        m_backupAdNames[i] = L"±¸ÓÃ";
+        m_backupAdNames[i] += std::to_wstring(i+1);
+    }
+
     Load();
 }
 
@@ -49,64 +55,17 @@ void CSettingManager::Load()
     if (root.isMember("log_level"))
     {
         m_nLogLevel = root["log_level"].asInt();
-    }   
-
-    if (root.isMember("row_count"))
-    {
-        m_rowCount = root["row_count"].asInt();
     }
 
-    if (root.isMember("column_count"))
-    {
-        m_columnCount = root["column_count"].asInt();
-    }
-
-    if (root.isMember("front_count"))
-    {
-        m_frontCount = root["front_count"].asInt();
-    }
-
-    if (root.isMember("back_count"))
-    {
-        m_backCount = root["back_count"].asInt();
-    }
-
-    if (root.isMember("capture_rect"))
-    {
-        m_captureRect.left = root["capture_rect"]["x"].asInt();
-        m_captureRect.top = root["capture_rect"]["y"].asInt();
-        m_captureRect.bottom = m_captureRect.top + root["capture_rect"]["height"].asInt();
-        m_captureRect.right = m_captureRect.left + root["capture_rect"]["width"].asInt();
-    }
-
-    if (root.isMember("record_frame_rate"))
-    {
-        m_recordFrameRate = root["record_frame_rate"].asInt();
-    }
-
-    if (root.isMember("cache_duration"))
-    {
-        m_cacheDuration = root["cache_duration"].asInt();
-    }
+    // todo by yejinlong, load other config
 }
 
 void CSettingManager::Save()
 {
     Json::Value root = Json::objectValue;
-    root["log_level"] = m_nLogLevel;    
-    root["row_count"] = m_rowCount;    
-    root["column_count"] = m_columnCount;    
-    root["front_count"] = m_frontCount;    
-    root["back_count"] = m_backCount;
-    root["record_frame_rate"] = m_recordFrameRate;
-    root["cache_duration"] = m_cacheDuration;
+    root["log_level"] = m_nLogLevel;
 
-    Json::Value captureRect = Json::objectValue;
-    captureRect["x"] = m_captureRect.left;
-    captureRect["y"] = m_captureRect.top;
-    captureRect["width"] = m_captureRect.Width();
-    captureRect["height"] = m_captureRect.Height();
-    root["capture_rect"] = captureRect;
+    // todo by yejinlong, save other config
 
     std::wstring strConfFilePath = CImPath::GetConfPath() + L"configs.json";
     std::ofstream outputFile(strConfFilePath);
@@ -121,34 +80,4 @@ void CSettingManager::Save()
     {
         LOG_ERROR(L"failed to open the basic configure file : %s", strConfFilePath.c_str());
     }
-}
-
-void CSettingManager::SetRowCount(int rowCount)
-{
-    m_rowCount = rowCount;
-    Save();
-}
-
-void CSettingManager::SetColumnCount(int columnCount)
-{
-    m_columnCount = columnCount;
-    Save();
-}
-
-void CSettingManager::SetFrontCount(int frontCount)
-{
-    m_frontCount = frontCount;
-    Save();
-}
-
-void CSettingManager::SetBackCount(int backCount)
-{
-    m_backCount = backCount;
-    Save();
-}
-
-void CSettingManager::SetCaptureRect(CRect rect)
-{
-    m_captureRect = rect;
-    Save();
 }
