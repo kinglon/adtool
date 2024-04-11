@@ -31,13 +31,8 @@ public:
 	// id
 	std::wstring m_id;
 
-	// 位置
-	int m_x = 0;
-	int m_y = 0;
-
-	// 宽高
-	int m_width = 100;
-	int m_height = 100;
+	// 广告区域
+	RECT m_region;
 
 	// 广告类别，1开始
 	int m_type = AD_TYPE_MIN;

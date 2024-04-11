@@ -28,6 +28,7 @@ void CTempManagerDlg::DoDataExchange(CDataExchange* pDX)
 	CDialogEx::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_EDIT_GROUP, m_groupEdit);
 	DDX_Control(pDX, IDC_LIST_TEMPLATE, m_templateList);
+	DDX_Control(pDX, IDC_EDIT_TEMPLATE, m_templateEdit);
 }
 
 
@@ -84,20 +85,24 @@ void CTempManagerDlg::OnBnClickedButtonSearch()
 {
 	CString groupName;
 	m_groupEdit.GetWindowText(groupName);
-	if (groupName.IsEmpty())
-	{
-		MessageBox(L"分组不能为空", L"提示", MB_OK);
-		return;
-	}
+	CString templateName;
+	m_templateEdit.GetWindowText(templateName);
 
 	const auto templates = CSettingManager::GetInstance()->m_templates;
 	std::vector<CTemplateItem> results;
 	for (const auto& item : templates)
 	{
-		if (item.m_groupName.find(groupName) != -1)
+		if (!templateName.IsEmpty() && item.m_name.find(templateName) == -1)
 		{
-			results.push_back(item);
+			continue;
 		}
+
+		if (!groupName.IsEmpty() && item.m_groupName.find(groupName) == -1)
+		{
+			continue;
+		}
+
+		results.push_back(item);
 	}
 
 	InitControlData(results);
@@ -133,23 +138,23 @@ void CTempManagerDlg::OnTemplateEdit()
 
 	// 获取模板ID
 	CString templateName = m_templateList.GetItemText(selIndex, 0);
-	std::wstring id;
+	CTemplateItem templateItem;
 	auto& templates = CSettingManager::GetInstance()->m_templates;
 	for (auto it = templates.begin(); it != templates.end(); it++)
 	{
 		if (it->m_name == (LPCTSTR)templateName)
 		{
-			id = it->m_id;
+			templateItem = *it;
 			break;
 		}
 	}
-	if (id.empty())
+	if (templateItem.m_id.empty())
 	{
 		return;
 	}
 
 	CTemplateDlg dlg;
-	dlg.m_id = id;
+	dlg.m_template = templateItem;
 	if (dlg.DoModal() == IDOK)
 	{
 		InitControlData(CSettingManager::GetInstance()->m_templates);

@@ -195,6 +195,7 @@
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="AdDlg.h" />
     <ClInclude Include="adtool.h" />
     <ClInclude Include="AdToolDlg.h" />
     <ClInclude Include="framework.h" />
@@ -215,6 +216,7 @@
     <ClInclude Include="Utility\LogUtil.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="AdDlg.cpp" />
     <ClCompile Include="adtool.cpp" />
     <ClCompile Include="AdToolDlg.cpp" />
     <ClCompile Include="GenImageDlg.cpp" />

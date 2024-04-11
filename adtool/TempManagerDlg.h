@@ -34,4 +34,5 @@ public:
 	afx_msg void OnNMRClickListTemplate(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnTemplateEdit();
 	afx_msg void OnTemplateDelete();
+	CEdit m_templateEdit;
 };

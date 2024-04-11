@@ -23,5 +23,8 @@ public:
 	// @param adSettings, 广告设置
 	// @return 渲染图片的句柄，调用者负责释放
 	HBITMAP Do(const CTemplateItem& tempItem, const CAdSettingItem adSettings[AD_TYPE_MAX]);
+
+	// 按比例缩放图片
+	static HBITMAP ScaleBitmap(HBITMAP bitmap, float scaleFactor);
 };
 
