@@ -236,7 +236,7 @@ void CTemplateDlg::HandleDropFile(HDROP hDropInfo)
 		}
 	}
 
-	// 不是设置给广告，就设置给模板图片
+	// 不是设置给广告，就设置给模板图片	
 	m_template.m_imageFileName = szFileName;
 	UpdatePreviewCtrl();
 }

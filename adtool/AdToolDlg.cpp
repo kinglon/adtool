@@ -125,11 +125,12 @@ void CAdToolDlg::InitControls()
 		}
 	}
 
-	// 初始化备用广告的名字
-	const auto& backupAdNames = CSettingManager::GetInstance()->m_backupAdNames;
-	for (int i = 0; i < BACKUP_AD_COUNT; i++)
+	// 初始化广告的名字
+	std::wstring adNames[AD_TYPE_MAX];
+	CSettingManager::GetInstance()->GetAdNames(adNames);;
+	for (int i = 0; i < AD_TYPE_MAX; i++)
 	{
-		GetDlgItem(IDC_AD_BACKUP_1 + i)->SetWindowText(backupAdNames[i].c_str());
+		GetDlgItem(IDC_AD_STATIC_1 + i)->SetWindowText(adNames[i].c_str());
 	}
 }
 

@@ -18,6 +18,10 @@ public:
 public:
 	static CString GetGuid();
 
+private:
+	// 初始化控件，只调用一次
+	void InitControls();
+
 // 对话框数据
 #ifdef AFX_DESIGN_TIME
 	enum { IDD = IDD_AD_DIALOG };
@@ -30,4 +34,15 @@ protected:
 public:
 	afx_msg void OnAdEdit();
 	afx_msg void OnAdDelete();
+	CEdit m_editX;
+	CEdit m_editY;
+	CEdit m_editWidth;
+	CEdit m_editHeight;
+	CComboBox m_comboType;
+	CComboBox m_comboImageAlign;
+	CButton m_checkVerShow;
+	CComboBox m_comboFont;
+	CComboBox m_comboTextAlign;
+	virtual BOOL OnInitDialog();
+	afx_msg void OnBnClickedOk();
 };

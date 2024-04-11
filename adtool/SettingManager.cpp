@@ -81,3 +81,19 @@ void CSettingManager::Save()
         LOG_ERROR(L"failed to open the basic configure file : %s", strConfFilePath.c_str());
     }
 }
+
+void CSettingManager::GetAdNames(std::wstring adNames[AD_TYPE_MAX])
+{
+    adNames[0] = L"广告区(长方形)";
+    adNames[1] = L"广告区1(正方形)";
+    adNames[2] = L"广告区2(通用小)";
+    adNames[3] = L"窗贴广区";
+    adNames[4] = L"水电标胶带";
+    adNames[5] = L"电话区";
+    adNames[6] = L"电话区(间距大)";
+    adNames[7] = L"窗贴电话区";
+    for (int i = 8; i < AD_TYPE_MAX; i++)
+    {
+        adNames[i] = m_backupAdNames[i-8];
+    }
+}

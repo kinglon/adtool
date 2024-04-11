@@ -12,23 +12,30 @@
 #define IDD_TEMPLATE_DIALOG             134
 #define IDR_MENU_TEMPLATE               136
 #define IDD_AD_DIALOG                   137
-#define IDR_MENU1                       139
 #define IDR_MENU_AD                     139
 #define IDC_TEMPLATE_MANAGER_BTN        1000
 #define IDC_COMBO1                      1001
 #define IDC_GROUP_COMBO                 1001
+#define IDC_COMBO_TYPE                  1001
 #define IDC_SETTING_BTN                 1002
+#define IDC_COMBO_IMAGE_ALIGN           1002
 #define IDC_RADIO1                      1003
 #define IDC_AD_                         1003
+#define IDC_COMBO_FONT                  1003
 #define IDC_RADIO2                      1004
+#define IDC_COMBO_TEXT_ALIGN            1004
 #define IDC_EDIT1                       1005
 #define IDC_EDIT_GROUP                  1005
 #define IDC_EDIT_NAME                   1005
+#define IDC_EDIT_X                      1005
 #define IDC_EDIT2                       1006
 #define IDC_EDIT_TEMPLATE               1006
 #define IDC_EDIT_GROUPNAME              1006
+#define IDC_EDIT_Y                      1006
 #define IDC_RADIO3                      1007
+#define IDC_EDIT_WIDTH                  1007
 #define IDC_RADIO4                      1008
+#define IDC_EDIT_HEIGHT                 1008
 #define IDC_EDIT3                       1009
 #define IDC_EDIT4                       1010
 #define IDC_RADIO5                      1011
@@ -172,6 +179,7 @@
 #define IDC_PREVIEW_IMAGE               1407
 #define IDC_STATIC_NAME                 1408
 #define IDC_STATIC_GROUPNAME            1409
+#define IDC_CHECK_TEXT                  1410
 #define ID_32771                        32771
 #define ID_32772                        32772
 #define ID_TEMPLATE_EDIT                32773
@@ -187,7 +195,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        140
 #define _APS_NEXT_COMMAND_VALUE         32779
-#define _APS_NEXT_CONTROL_VALUE         1410
+#define _APS_NEXT_CONTROL_VALUE         1411
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif
