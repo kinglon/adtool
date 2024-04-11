@@ -82,7 +82,7 @@ void CGenImageDlg::ThreadProc()
 
 		CImage image;
 		image.Attach(bmp);
-		std::wstring imageSavePath = m_savePath + L"\\" + tempItem.m_imageFileName;
+		std::wstring imageSavePath = m_savePath + L"\\" + tempItem.m_name + L".png";
 		HRESULT hr = image.Save(imageSavePath.c_str());
 		image.Detach();
 		DeleteObject(bmp);

@@ -91,6 +91,8 @@ BOOL CAdToolApp::InitInstance()
 	ULONG_PTR gdiplusToken;
 	GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, nullptr);
 
+	// todo by yejinlong, 注册码验证
+
 	CAdToolDlg dlg;
 	m_pMainWnd = &dlg;
 	INT_PTR nResponse = dlg.DoModal();

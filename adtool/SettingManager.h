@@ -62,14 +62,14 @@ public:
 	// id
 	std::wstring m_id;
 
-	// 原来图片的名字
-	std::wstring m_imageOriginFileName;
-
-	// 位于data目录下
-	std::wstring m_imageFileName;
+	// 模板名字
+	std::wstring m_name;
 
 	// 分组名字
 	std::wstring m_groupName;
+
+	// 位于data目录下
+	std::wstring m_imageFileName;	
 
 	// 广告
 	std::vector<CAdItem> m_ads;

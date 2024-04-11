@@ -72,6 +72,9 @@
     <ClInclude Include="GenImageDlg.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="TemplateDlg.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="adtool.cpp">
@@ -111,6 +114,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="GenImageDlg.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="TemplateDlg.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
