@@ -77,8 +77,12 @@ void CGenImageDlg::ThreadProc()
 			break;
 		}
 
-		CTemplateRender render;
-		HBITMAP bmp = render.Do(tempItem, m_adSettings);
+		HBITMAP bmp = CTemplateRender::Do(tempItem, m_adSettings);
+		if (bmp == NULL)
+		{
+			m_success = false;
+			break;
+		}
 
 		CImage image;
 		image.Attach(bmp);

@@ -97,3 +97,20 @@ void CSettingManager::GetAdNames(std::wstring adNames[AD_TYPE_MAX])
         adNames[i] = m_backupAdNames[i-8];
     }
 }
+
+int CSettingManager::GetFontSize(int textLength)
+{
+    int distance = 1000;
+    int fontSize = 10;
+    for (const auto& item : m_textLength2Fonts)
+    {
+        int dis = abs(textLength - item.first);
+        if (dis < distance)
+        {
+            distance = dis;
+            fontSize = item.second;
+        }
+    }
+
+    return fontSize;
+}

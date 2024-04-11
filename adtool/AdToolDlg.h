@@ -32,9 +32,6 @@ private:
 	// 从界面获取广告输入设置
 	void GetAdSettings(CAdSettingItem adSettings[AD_TYPE_MAX]);
 
-	// 等比例缩放显示在容器内
-	HBITMAP AspectFitContainer(HBITMAP bmp, int sizeX, int sizeY);
-
 	// 检查广告配置是否正确
 	bool CheckAdSettings(const std::vector<CAdItem>& ads, CAdSettingItem adSettings[AD_TYPE_MAX]);
 

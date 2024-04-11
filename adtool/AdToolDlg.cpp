@@ -223,12 +223,6 @@ void CAdToolDlg::GetAdSettings(CAdSettingItem adSettings[AD_TYPE_MAX])
 	}
 }
 
-HBITMAP CAdToolDlg::AspectFitContainer(HBITMAP bmp, int sizeX, int sizeY)
-{
-	// todo by yejinlong
-	return NULL;
-}
-
 bool CAdToolDlg::CheckAdSettings(const std::vector<CAdItem>& ads, CAdSettingItem adSettings[AD_TYPE_MAX])
 {
 	CString errorAd;
@@ -439,8 +433,11 @@ void CAdToolDlg::OnBnClickedPreviewBtn()
 	CTemplateItem tempItem = MakeTemplateItemFromAds(ads);
 
 	// 渲染模板图片
-	CTemplateRender render;
-	HBITMAP bmp = render.Do(tempItem, adSettings);
+	HBITMAP bmp = CTemplateRender::Do(tempItem, adSettings);
+	if (bmp == NULL)
+	{
+		return;
+	}
 
 	// 显示图片
 	BITMAP bitmap;
@@ -452,9 +449,13 @@ void CAdToolDlg::OnBnClickedPreviewBtn()
 	if (bitmap.bmWidth > previewCtrlRect.Width() || bitmap.bmHeight > previewCtrlRect.Height())
 	{
 		// 显示不下等比例缩放
-		HBITMAP fitBmp = AspectFitContainer(bmp, previewCtrlRect.Width(), previewCtrlRect.Height());
-		DeleteObject(bmp);
-		bmp = fitBmp;
+		float scaleRatio = min(previewCtrlRect.Width() * 1.0f / bitmap.bmWidth, previewCtrlRect.Height() * 1.0f / bitmap.bmHeight);
+		HBITMAP newBmp = CTemplateRender::ScaleBitmap(bmp, scaleRatio);
+		if (newBmp != NULL)
+		{
+			DeleteObject(bmp);
+			bmp = newBmp;			
+		}
 	}
 
 	HBITMAP hOldBmp = m_previewImageCtrl.SetBitmap(bmp);

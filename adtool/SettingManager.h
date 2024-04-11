@@ -83,6 +83,9 @@ public:
 	// 广告名字
 	void GetAdNames(std::wstring adNames[AD_TYPE_MAX]);
 
+	// 根据文字长度获取字体大小
+	int GetFontSize(int textLength);
+
 	void Save();
 
 private:
@@ -91,10 +94,15 @@ private:
 public:
 	int m_nLogLevel = 2;  // debug	
 
+	COLORREF m_textColor = RGB(255, 255, 255);
+
 	// 模板列表
 	std::vector<CTemplateItem> m_templates;
 
 private:
 	// 备用广告名字
 	std::wstring m_backupAdNames[BACKUP_AD_COUNT];
+
+	// 字号与字长的关系
+	std::map<int, int> m_textLength2Fonts;
 };

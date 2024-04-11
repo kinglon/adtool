@@ -196,6 +196,8 @@ void CAdDlg::OnBnClickedOk()
 		}
 	}
 
+	// todo by yejinlong, 检查字体是否存在
+
 	if (m_ad.m_id.empty())
 	{
 		m_ad.m_id = GetGuid();

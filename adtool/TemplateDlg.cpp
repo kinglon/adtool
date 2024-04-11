@@ -104,8 +104,11 @@ void CTemplateDlg::UpdatePreviewCtrl()
 	}
 
 	// 渲染图片
-	CTemplateRender render;
-	HBITMAP bmp = render.Do(m_template, m_adSettings);
+	HBITMAP bmp = CTemplateRender::Do(m_template, m_adSettings);
+	if (bmp == NULL)
+	{
+		return;
+	}
 	
 	// 缩放图片
 	BITMAP bitmap;
