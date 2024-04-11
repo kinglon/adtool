@@ -13,9 +13,10 @@
 // 对齐方式
 #define AD_ALIGN_TOP					1
 #define AD_ALIGN_BOTTOM			2
-#define AD_ALIGN_LEFT					3
-#define AD_ALIGN_RIGHT				4
-#define AD_ALIGN_CENTER			5
+#define AD_ALIGN_VCENTER			3
+#define AD_ALIGN_LEFT					4
+#define AD_ALIGN_RIGHT				5
+#define AD_ALIGN_CENTER			6
 
 // 字体
 #define FONT_FANGZHENG_DAHEI			L"方正大黑"
@@ -60,6 +61,9 @@ class CTemplateItem
 public:
 	// id
 	std::wstring m_id;
+
+	// 原来图片的名字
+	std::wstring m_imageOriginFileName;
 
 	// 位于data目录下
 	std::wstring m_imageFileName;

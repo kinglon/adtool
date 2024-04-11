@@ -547,5 +547,15 @@ void CAdToolDlg::OnBnClickedGenImageBtn()
 
 	// 开始生成
 	CGenImageDlg genImageDlg;
+	genImageDlg.SetParams(templates, adSettings, savePath);
 	genImageDlg.DoModal();
+
+	if (genImageDlg.IsSuccess())
+	{
+		ShellExecute(NULL, L"open", savePath, NULL, NULL, SW_SHOW);
+	}
+	else
+	{
+		MessageBox(L"图片生成失败", L"提示", MB_OK);
+	}
 }
