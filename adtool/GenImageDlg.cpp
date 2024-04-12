@@ -57,6 +57,10 @@ BOOL CGenImageDlg::OnInitDialog()
 
 	m_progress.SetRange32(0, (int)m_templates.size());
 	m_progress.SetPos(0);
+
+	CString progressValue;
+	progressValue.Format(L"0/%d",m_templates.size());
+	m_progressStatic.SetWindowText(progressValue);
 	
 	// 启动图片生成线程
 	m_thread = new std::thread(&CGenImageDlg::ThreadProc, this);
@@ -87,6 +91,7 @@ void CGenImageDlg::ThreadProc()
 		CImage image;
 		image.Attach(bmp);
 		std::wstring imageSavePath = m_savePath + L"\\" + tempItem.m_name + L".png";
+		::DeleteFile(imageSavePath.c_str());
 		HRESULT hr = image.Save(imageSavePath.c_str());
 		image.Detach();
 		DeleteObject(bmp);
@@ -97,6 +102,7 @@ void CGenImageDlg::ThreadProc()
 			break;
 		}
 
+		std::this_thread::sleep_for(std::chrono::seconds(1));
 		PostMessage(WM_FINISH_ONE_ITEM);
 	}
 

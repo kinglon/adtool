@@ -18,12 +18,7 @@ IMPLEMENT_DYNAMIC(CTemplateDlg, CDialogEx)
 CTemplateDlg::CTemplateDlg(CWnd* pParent /*=nullptr*/)
 	: CDialogEx(IDD_TEMPLATE_DIALOG, pParent)
 {
-	for (int i = 0; i < AD_TYPE_MAX; i++)
-	{
-		m_adSettings[i].m_imageMode = false;
-		m_adSettings[i].m_textContent = L"广告";
-		m_adSettings[i].m_textContent += std::to_wstring(i+1);
-	}
+	
 }
 
 CTemplateDlg::~CTemplateDlg()
@@ -51,7 +46,8 @@ BEGIN_MESSAGE_MAP(CTemplateDlg, CDialogEx)
 	ON_STN_CLICKED(IDC_PREVIEW_IMAGE, &CTemplateDlg::OnStnClickedPreviewImage)
 	ON_COMMAND(ID_AD_EDIT, &CTemplateDlg::OnAdEdit)
 	ON_COMMAND(ID_AD_DELETE, &CTemplateDlg::OnAdDelete)
-	ON_COMMAND(ID_TEMPLATE_PREVIEW_TEXT, &CTemplateDlg::OnTemplatePreviewText)
+	ON_WM_SHOWWINDOW()
+	ON_COMMAND(ID_AD_PREVIEW, &CTemplateDlg::OnAdPreview)
 END_MESSAGE_MAP()
 
 
@@ -85,9 +81,9 @@ void CTemplateDlg::InitControls()
 	for (int i = 0; i < ARRAYSIZE(okCancelBtn); i++)
 	{
 		CRect rect;
-		controls[i]->GetWindowRect(&rect);
+		okCancelBtn[i]->GetWindowRect(&rect);
 		ScreenToClient(&rect);
-		rect.bottom += heightChange;
+		rect.OffsetRect(0, heightChange);
 		okCancelBtn[i]->MoveWindow(&rect);
 	}
 	Invalidate();
@@ -189,7 +185,7 @@ void CTemplateDlg::ImageCtrlToRealImage(LPPOINT pt)
 
 	// 按比例缩放转为原始图片的位置
 	pt->x = int(pt->x / m_scaleRatio);
-	pt->x = int(pt->y / m_scaleRatio);
+	pt->y = int(pt->y / m_scaleRatio);
 }
 
 void CTemplateDlg::HandleDropFile(HDROP hDropInfo)
@@ -254,12 +250,11 @@ BOOL CTemplateDlg::OnInitDialog()
 	ChangeWindowMessageFilter(WM_DROPFILES, MSGFLT_ADD);
 	ChangeWindowMessageFilter(0x0049, MSGFLT_ADD); // 0x0049 == WM_COPYGLOBALDATA		
 
-	// 最大化
+	// 获取初始尺寸
 	CRect wndRect;
 	GetClientRect(&wndRect);
 	m_initSizeX = wndRect.Width();
 	m_initSizeY = wndRect.Height();
-	PostMessage(WM_SHOW_MAX);
 
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// 异常: OCX 属性页应返回 FALSE
@@ -291,11 +286,10 @@ void CTemplateDlg::OnSize(UINT nType, int cx, int cy)
 	CDialogEx::OnSize(nType, cx, cy);
 
 	if (nType == SIZE_MAXIMIZED)
-	{
-		static bool bFirst = true;
-		if (bFirst)
+	{		
+		if (m_firstMaximize)
 		{
-			bFirst = false;
+			m_firstMaximize = false;
 			InitControls();
 		}
 	}
@@ -327,9 +321,9 @@ void CTemplateDlg::OnBnClickedOk()
 	// 校验模板名字是否重复
 	bool exist = false;
 	auto& templates = CSettingManager::GetInstance()->m_templates;
-	for (auto item : templates)
+	for (auto& item : templates)
 	{
-		if (item.m_id != m_template.m_id && item.m_name == m_template.m_name)
+		if (item.m_id != m_template.m_id && item.m_name == (LPCTSTR)name)
 		{
 			exist = true;
 			break;
@@ -342,7 +336,7 @@ void CTemplateDlg::OnBnClickedOk()
 	}
 
 	// 校验图片文件是否存在
-	if (m_template.m_imageFileName.empty() || !PathFileExists(m_template.m_imageFileName.c_str()))
+	if (m_template.m_imageFileName.empty())
 	{
 		MessageBox(L"请设置模板图片", L"提示", MB_OK);
 		return;
@@ -352,23 +346,41 @@ void CTemplateDlg::OnBnClickedOk()
 	m_template.m_name = (LPCTSTR)name;
 	m_template.m_groupName = (LPCTSTR)groupName;
 
-	// 拷贝文件到data目录
-	std::wstring extension;
-	int index = m_template.m_imageFileName.rfind(L'.');
-	if (index != -1)
+	// 如果设置为外部图片，拷贝文件到data目录
+	if (m_template.m_imageFileName.find(L':') != -1)
 	{
-		extension = m_template.m_imageFileName.substr(index);
+		std::wstring extension;
+		int index = m_template.m_imageFileName.rfind(L'.');
+		if (index != -1)
+		{
+			extension = m_template.m_imageFileName.substr(index);
+		}
+		std::wstring newFileName = std::wstring((LPCTSTR)CAdDlg::GetGuid()) + extension;
+		std::wstring newFilePath = CImPath::GetDataPath() + newFileName;
+		if (!CopyFile(m_template.m_imageFileName.c_str(), newFilePath.c_str(), TRUE))
+		{
+			LOG_ERROR(L"failed to copy image %s", newFilePath.c_str());
+			MessageBox(L"拷贝模板图片失败", L"提示", MB_OK);
+			return;
+		}
+		m_template.m_imageFileName = newFileName;
 	}
-	std::wstring newFileName = std::wstring((LPCTSTR)CAdDlg::GetGuid()) + extension;
-	std::wstring newFilePath = CImPath::GetDataPath() + newFileName;
-	if (!CopyFile(m_template.m_imageFileName.c_str(), newFilePath.c_str(), TRUE))
-	{
-		LOG_ERROR(L"failed to copy image %s", newFilePath.c_str());
-	}
-	m_template.m_imageFileName = newFileName;
 
 	// 更新到配置
-	templates.push_back(m_template);
+	exist = false;
+	for (auto& item : templates)
+	{
+		if (item.m_id == m_template.m_id)
+		{
+			item = m_template;
+			exist = true;
+			break;
+		}
+	}
+	if (!exist)
+	{
+		templates.push_back(m_template);
+	}
 	CSettingManager::GetInstance()->Save();
 
 	CDialogEx::OnOK();
@@ -377,6 +389,11 @@ void CTemplateDlg::OnBnClickedOk()
 
 void CTemplateDlg::OnStnDblclickPreviewImage()
 {
+	if (m_template.m_imageFileName.empty())
+	{
+		return;
+	}
+
 	CAdItem* ad = GetCurrentPosAd();
 	if (ad)  // 已经有广告，不能添加
 	{
@@ -405,7 +422,7 @@ void CTemplateDlg::OnStnClickedPreviewImage()
 	m_adId = ad->m_id;
 
 	CMenu menu;
-	menu.LoadMenu(IDR_MENU_TEMPLATE);
+	menu.LoadMenu(IDR_MENU_AD);
 
 	CMenu* pContextMenu = menu.GetSubMenu(0);
 	if (pContextMenu == nullptr)
@@ -468,8 +485,18 @@ void CTemplateDlg::OnAdDelete()
 	UpdatePreviewCtrl();
 }
 
+void CTemplateDlg::OnShowWindow(BOOL bShow, UINT nStatus)
+{
+	CDialogEx::OnShowWindow(bShow, nStatus);
 
-void CTemplateDlg::OnTemplatePreviewText()
+	if (bShow && m_firstMaximize)
+	{
+		PostMessage(WM_SHOW_MAX);
+	}
+}
+
+
+void CTemplateDlg::OnAdPreview()
 {
 	CGetTextDlg dlg;
 	dlg.m_strWndTitle = L"广告语";

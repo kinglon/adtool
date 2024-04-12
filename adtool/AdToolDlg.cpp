@@ -82,6 +82,7 @@ BEGIN_MESSAGE_MAP(CAdToolDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_PREVIEW_BTN, &CAdToolDlg::OnBnClickedPreviewBtn)
 	ON_WM_DROPFILES()
 	ON_BN_CLICKED(IDC_GEN_IMAGE_BTN, &CAdToolDlg::OnBnClickedGenImageBtn)
+	ON_WM_SHOWWINDOW()
 END_MESSAGE_MAP()
 
 
@@ -146,7 +147,7 @@ void CAdToolDlg::InitGroupControl()
 		groups.insert(groups.end(), item.m_groupName);
 	}
 
-	m_groupCombo.Clear();
+	m_groupCombo.ResetContent();
 	for (const auto& item : groups)
 	{
 		m_groupCombo.AddString(item.c_str());
@@ -417,12 +418,11 @@ BOOL CAdToolDlg::OnInitDialog()
 	ChangeWindowMessageFilter(WM_DROPFILES, MSGFLT_ADD);
 	ChangeWindowMessageFilter(0x0049, MSGFLT_ADD); // 0x0049 == WM_COPYGLOBALDATA		
 
-	// 最大化
+	// 获取初始大小
 	CRect wndRect;
 	GetClientRect(&wndRect);
 	m_initSizeX = wndRect.Width();
 	m_initSizeY = wndRect.Height();
-	PostMessage(WM_SHOW_MAX);
 
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
@@ -495,11 +495,10 @@ void CAdToolDlg::OnSize(UINT nType, int cx, int cy)
 	CDialogEx::OnSize(nType, cx, cy);
 
 	if (nType == SIZE_MAXIMIZED)
-	{
-		static bool bFirst = true;
-		if (bFirst)
+	{		
+		if (m_firstMaximize)
 		{
-			bFirst = false;
+			m_firstMaximize = false;
 			InitControls();
 		}
 	}
@@ -678,5 +677,16 @@ void CAdToolDlg::OnBnClickedGenImageBtn()
 	else
 	{
 		MessageBox(L"图片生成失败", L"提示", MB_OK);
+	}
+}
+
+
+void CAdToolDlg::OnShowWindow(BOOL bShow, UINT nStatus)
+{
+	CDialogEx::OnShowWindow(bShow, nStatus);
+
+	if (bShow && m_firstMaximize)
+	{
+		PostMessage(WM_SHOW_MAX);
 	}
 }

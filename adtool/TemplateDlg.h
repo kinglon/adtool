@@ -33,6 +33,9 @@ private:
 	// 准备编辑或删除等操作的广告
 	std::wstring m_adId;
 
+	// 标志是否第一次最大化
+	bool m_firstMaximize = true;
+
 private:
 	// 初始化控件，只调一次
 	void InitControls();
@@ -73,5 +76,6 @@ public:
 	afx_msg void OnStnClickedPreviewImage();
 	afx_msg void OnAdEdit();
 	afx_msg void OnAdDelete();
-	afx_msg void OnTemplatePreviewText();
+	afx_msg void OnShowWindow(BOOL bShow, UINT nStatus);
+	afx_msg void OnAdPreview();
 };

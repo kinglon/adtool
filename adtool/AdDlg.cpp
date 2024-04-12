@@ -196,13 +196,6 @@ void CAdDlg::OnBnClickedOk()
 		}
 	}
 
-	Gdiplus::Font font(m_ad.m_fontName.c_str(), 10);
-	if (font.GetLastStatus() != Gdiplus::Ok)
-	{
-		MessageBox(L"系统没有选择的字体", L"提示", MB_OK);
-		return;
-	}
-
 	if (m_ad.m_id.empty())
 	{
 		m_ad.m_id = GetGuid();

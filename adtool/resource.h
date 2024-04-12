@@ -193,13 +193,17 @@
 #define ID_AD_DELETE                    32778
 #define ID_32779                        32779
 #define ID_TEMPLATE_PREVIEW_TEXT        32780
+#define ID_32781                        32781
+#define ID_32782                        32782
+#define ID_AD_RREVIEW                   32783
+#define ID_AD_PREVIEW                   32784
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        142
-#define _APS_NEXT_COMMAND_VALUE         32781
+#define _APS_NEXT_COMMAND_VALUE         32785
 #define _APS_NEXT_CONTROL_VALUE         1412
 #define _APS_NEXT_SYMED_VALUE           101
 #endif

@@ -79,7 +79,7 @@ void CSettingManager::Load()
             
             for (unsigned int j = 0; j < value["ad"].size(); j++)
             {
-                auto& adValue = value[j];
+                auto& adValue = value["ad"][j];
                 CAdItem adItem;
                 adItem.m_id = CImCharset::UTF8ToUnicode(adValue["id"].asString().c_str());
                 adItem.m_region.left = adValue["left"].asInt();
@@ -146,7 +146,7 @@ void CSettingManager::Save()
             adValue["font_name"] = CImCharset::UnicodeToUTF8(adItem.m_fontName.c_str());
             adValue["image_align"] = adItem.m_imageAlign;
             adValue["text_align"] = adItem.m_textAlign;
-            value.append(adValue);
+            value["ad"].append(adValue);
         }
         root["template"].append(value);
     }

@@ -38,8 +38,12 @@ private:
 	bool CheckAdSettings(const std::vector<CAdItem>& ads, CAdSettingItem adSettings[AD_TYPE_MAX]);
 
 private:
+	// 窗口初始大小
 	int m_initSizeX = 0;
 	int m_initSizeY = 0;
+
+	// 标志是否第一次手动最大化
+	bool m_firstMaximize = true;
 
 // 对话框数据
 #ifdef AFX_DESIGN_TIME
@@ -69,4 +73,5 @@ public:
 	CStatic m_previewImageCtrl;
 	afx_msg void OnDropFiles(HDROP hDropInfo);
 	afx_msg void OnBnClickedGenImageBtn();
+	afx_msg void OnShowWindow(BOOL bShow, UINT nStatus);
 };

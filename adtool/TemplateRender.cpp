@@ -44,7 +44,7 @@ HBITMAP CTemplateRender::Do(const CTemplateItem& tempItem, const CAdSettingItem 
 
             // º∆À„Àı∑≈±»¿˝
             int adRegionWidth = ad.m_region.right - ad.m_region.left;
-            int adRegionHeight = ad.m_region.bottom - ad.m_region.right;
+            int adRegionHeight = ad.m_region.bottom - ad.m_region.top;
             float scaleRatio = min(adRegionWidth * 1.0f / adImage.GetWidth(), adRegionHeight * 1.0f / adImage.GetHeight());
             int displayWidth = int(adImage.GetWidth()*scaleRatio);
             int displayHeight = int(adImage.GetHeight() * scaleRatio);
@@ -125,8 +125,8 @@ HBITMAP CTemplateRender::Do(const CTemplateItem& tempItem, const CAdSettingItem 
 void CTemplateRender::PaintAdRect(Gdiplus::Graphics& graphics, const CAdItem& ad)
 {
     Gdiplus::Rect rect(ad.m_region.left, ad.m_region.top, ad.m_region.right - ad.m_region.left, ad.m_region.bottom - ad.m_region.top);
-    Gdiplus::Pen pen(Gdiplus::Color::White);
-    graphics.DrawRectangle(&pen, rect);
+    Gdiplus::SolidBrush brush(Gdiplus::Color::White);
+    graphics.FillRectangle(&brush, rect);
 }
 
 HBITMAP CTemplateRender::ScaleBitmap(HBITMAP bitmap, float scaleFactor)
