@@ -181,7 +181,7 @@ void CAdDlg::OnBnClickedOk()
 	m_ad.m_fontName = text;
 	if (m_ad.m_bHorizon)
 	{
-		if (m_ad.m_textAlign != AD_ALIGN_TOP || m_ad.m_textAlign != AD_ALIGN_BOTTOM)
+		if (m_ad.m_textAlign != AD_ALIGN_TOP && m_ad.m_textAlign != AD_ALIGN_BOTTOM)
 		{
 			MessageBox(L"文字水平显示，请选择上对齐或下对齐", L"提示", MB_OK);
 			return;
@@ -189,14 +189,19 @@ void CAdDlg::OnBnClickedOk()
 	}
 	else
 	{
-		if (m_ad.m_textAlign != AD_ALIGN_LEFT || m_ad.m_textAlign != AD_ALIGN_RIGHT)
+		if (m_ad.m_textAlign != AD_ALIGN_LEFT && m_ad.m_textAlign != AD_ALIGN_RIGHT)
 		{
 			MessageBox(L"文字垂直显示，请选择左对齐或右对齐", L"提示", MB_OK);
 			return;
 		}
 	}
 
-	// todo by yejinlong, 检查字体是否存在
+	Gdiplus::Font font(m_ad.m_fontName.c_str(), 10);
+	if (font.GetLastStatus() != Gdiplus::Ok)
+	{
+		MessageBox(L"系统没有选择的字体", L"提示", MB_OK);
+		return;
+	}
 
 	if (m_ad.m_id.empty())
 	{

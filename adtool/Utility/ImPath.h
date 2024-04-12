@@ -26,7 +26,7 @@ public:
     /**
     @name 获取系统本地临时文件夹路径%AppData%\\Local
     */
-	static std::wstring GetLocalAppDataPath();
+	static std::wstring GetLocalAppDataPath(std::wstring appName);
 
 	/**
 	@name 获取系统本地临时文件夹路径%AppData%\\Roaming

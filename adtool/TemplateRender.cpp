@@ -2,7 +2,7 @@
 #include "TemplateRender.h"
 #include "ImPath.h"
 
-HBITMAP CTemplateRender::Do(const CTemplateItem& tempItem, const CAdSettingItem adSettings[AD_TYPE_MAX])
+HBITMAP CTemplateRender::Do(const CTemplateItem& tempItem, const CAdSettingItem adSettings[AD_TYPE_MAX], bool useDefaultAd)
 {  
     // Load the original image
     std::wstring imageFilePath = tempItem.m_imageFileName;
@@ -26,8 +26,12 @@ HBITMAP CTemplateRender::Do(const CTemplateItem& tempItem, const CAdSettingItem 
         auto& adSetting = adSettings[ad.m_type - 1];
         if (adSetting.m_imageMode)  // ª≠π„∏ÊÕº∆¨
         {
-            if (adSetting.m_imageFilePath.empty())
+            if (adSetting.m_imageFilePath.empty())  // √ª≈‰÷√
             {
+                if (useDefaultAd)
+                {
+                    PaintAdRect(graphics, ad);
+                }
                 continue;
             }
 
@@ -72,8 +76,12 @@ HBITMAP CTemplateRender::Do(const CTemplateItem& tempItem, const CAdSettingItem 
         }
         else
         {
-            if (adSetting.m_textContent.empty())
+            if (adSetting.m_textContent.empty())  // √ª≈‰÷√
             {
+                if (useDefaultAd)
+                {
+                    PaintAdRect(graphics, ad);
+                }
                 continue;
             }
 
@@ -112,6 +120,13 @@ HBITMAP CTemplateRender::Do(const CTemplateItem& tempItem, const CAdSettingItem 
         return NULL;
     }
     return resultBmp;
+}
+
+void CTemplateRender::PaintAdRect(Gdiplus::Graphics& graphics, const CAdItem& ad)
+{
+    Gdiplus::Rect rect(ad.m_region.left, ad.m_region.top, ad.m_region.right - ad.m_region.left, ad.m_region.bottom - ad.m_region.top);
+    Gdiplus::Pen pen(Gdiplus::Color::White);
+    graphics.DrawRectangle(&pen, rect);
 }
 
 HBITMAP CTemplateRender::ScaleBitmap(HBITMAP bitmap, float scaleFactor)

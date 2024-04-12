@@ -11,6 +11,7 @@
 #include "TempManagerDlg.h"
 #include <gdiplus.h>
 #include "GenImageDlg.h"
+#include "ImPath.h"
 
 using namespace Gdiplus;
 
@@ -20,6 +21,8 @@ using namespace Gdiplus;
 
 
 #define WM_SHOW_MAX  (WM_USER+100)
+
+#define PREVIEW_TEMP_IMAGE		L"preview_temp_image.jpg"
 
 class CAboutDlg : public CDialogEx
 {
@@ -196,11 +199,122 @@ std::vector<CAdItem> CAdToolDlg::GetAdsFromTemplates(const std::vector<CTemplate
 	return ads;
 }
 
-CTemplateItem CAdToolDlg::MakeTemplateItemFromAds(const std::vector<CAdItem>& ads)
+bool CAdToolDlg::MakeTemplateItemFromAds(const std::vector<CAdItem>& ads, CTemplateItem& tempItem)
 {
-	// todo by yejinlong, MakeTemplateItemFromAds
-	return CTemplateItem();
+	CRect previewRect;
+	m_previewImageCtrl.GetClientRect(&previewRect);
+	int maxWidth = previewRect.Width();
+	int padding = 20;
+	int nextX = padding;
+	int nextY = padding;
+
+	// 一行从左到右排列，如果排不下再从第2行排列
+	for (unsigned int i=0; i<ads.size(); i++)
+	{
+		const auto& ad = ads[i];
+		int adWidth = ad.m_region.right - ad.m_region.left;
+		int adHeight = ad.m_region.bottom - ad.m_region.top;
+
+		// 广告太大，一个都显示不下
+		if (adWidth + 2 * padding > maxWidth)
+		{
+			LOG_ERROR(L"the ad width is too large");
+			continue;
+		}
+
+		if (nextX + adWidth + padding <= maxWidth)  // 该行可以放得下
+		{
+			CAdItem adItem = ad;
+			adItem.m_region.left = nextX;
+			adItem.m_region.top = nextY;
+			adItem.m_region.right = adItem.m_region.left + adWidth;
+			adItem.m_region.bottom = adItem.m_region.top + adHeight;
+			tempItem.m_ads.push_back(adItem);
+			nextX += adWidth + padding;
+		}
+		else // 起新的一行
+		{			
+			for (const auto& item : tempItem.m_ads)
+			{				
+				nextY = max(nextY, item.m_region.bottom);
+			}
+			nextY += padding;
+			nextX = padding;
+			i--;
+		}
+	}
+
+	// 计算模板图片宽高
+	int right = 0;
+	int bottom = 0;
+	for (const auto& item : tempItem.m_ads)
+	{
+		right = max(item.m_region.right, right);
+		bottom = max(item.m_region.bottom, bottom);
+	}
+	right += padding;
+	bottom += padding;
+
+	// 生成模板图片
+	Bitmap bitmap(right, bottom, PixelFormat32bppARGB);
+	Graphics graphics(&bitmap);
+
+	Pen blackPen(Color::Black);
+	graphics.DrawRectangle(&blackPen, 0, 0, right, bottom);
+
+	std::wstring imageFilePath = CImPath::GetLocalAppDataPath(APPNAME) + PREVIEW_TEMP_IMAGE;
+	::DeleteFile(imageFilePath.c_str());
+	CLSID jpgEncoderClsid = GetEncoderClsid(L"image/jpeg");
+	if (jpgEncoderClsid == CLSID_NULL)
+	{
+		LOG_ERROR(L"failed to save the preview temp image, not have jpeg encoder");
+		return false;
+	}
+
+	auto result = bitmap.Save(imageFilePath.c_str(), &jpgEncoderClsid);
+	if (result != Gdiplus::Ok)
+	{
+		LOG_ERROR(L"failed to save the preview temp image, path is %s, error is %d",
+			imageFilePath.c_str(), result);
+		return false;
+	}
+
+	tempItem.m_imageFileName = imageFilePath;
+	return true;
 }
+
+CLSID CAdToolDlg::GetEncoderClsid(const WCHAR* format)
+{
+	UINT num = 0;   // number of image encoders
+	UINT size = 0;  // size of the image encoder array in bytes
+
+	ImageCodecInfo* pImageCodecInfo = nullptr;
+
+	GetImageEncodersSize(&num, &size);
+	if (size == 0)
+		return CLSID_NULL;  // No image encoders found
+
+	pImageCodecInfo = (ImageCodecInfo*)(malloc(size));
+	if (pImageCodecInfo == nullptr)
+		return CLSID_NULL;  // Memory allocation failed
+
+	GetImageEncoders(num, size, pImageCodecInfo);
+
+	for (UINT j = 0; j < num; ++j)
+	{
+		if (wcscmp(pImageCodecInfo[j].MimeType, format) == 0)
+		{
+			CLSID clsid;
+			clsid = pImageCodecInfo[j].Clsid;
+			free(pImageCodecInfo);
+			return clsid;
+		}
+	}
+
+	free(pImageCodecInfo);
+	return CLSID_NULL;  // No matching encoder found
+}
+
 
 void CAdToolDlg::GetAdSettings(CAdSettingItem adSettings[AD_TYPE_MAX])
 {
@@ -430,10 +544,15 @@ void CAdToolDlg::OnBnClickedPreviewBtn()
 	GetAdSettings(adSettings);
 
 	// 从广告生成一个模板对象
-	CTemplateItem tempItem = MakeTemplateItemFromAds(ads);
+	CTemplateItem tempItem;
+	if (!MakeTemplateItemFromAds(ads, tempItem))
+	{
+		MessageBox(L"预览图生成失败，请重试", L"提示", MB_OK);
+		return;
+	}
 
 	// 渲染模板图片
-	HBITMAP bmp = CTemplateRender::Do(tempItem, adSettings);
+	HBITMAP bmp = CTemplateRender::Do(tempItem, adSettings, true);
 	if (bmp == NULL)
 	{
 		return;

@@ -13,6 +13,7 @@
 #define IDR_MENU_TEMPLATE               136
 #define IDD_AD_DIALOG                   137
 #define IDR_MENU_AD                     139
+#define IDD_GET_TEXT_DIALOG             140
 #define IDC_TEMPLATE_MANAGER_BTN        1000
 #define IDC_COMBO1                      1001
 #define IDC_GROUP_COMBO                 1001
@@ -28,6 +29,7 @@
 #define IDC_EDIT_GROUP                  1005
 #define IDC_EDIT_NAME                   1005
 #define IDC_EDIT_X                      1005
+#define IDC_EDIT_TEXT                   1005
 #define IDC_EDIT2                       1006
 #define IDC_EDIT_TEMPLATE               1006
 #define IDC_EDIT_GROUPNAME              1006
@@ -180,6 +182,7 @@
 #define IDC_STATIC_NAME                 1408
 #define IDC_STATIC_GROUPNAME            1409
 #define IDC_CHECK_TEXT                  1410
+#define IDC_STATIC_TITLE                1411
 #define ID_32771                        32771
 #define ID_32772                        32772
 #define ID_TEMPLATE_EDIT                32773
@@ -188,14 +191,16 @@
 #define ID_32776                        32776
 #define ID_AD_EDIT                      32777
 #define ID_AD_DELETE                    32778
+#define ID_32779                        32779
+#define ID_TEMPLATE_PREVIEW_TEXT        32780
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        140
-#define _APS_NEXT_COMMAND_VALUE         32779
-#define _APS_NEXT_CONTROL_VALUE         1411
+#define _APS_NEXT_RESOURCE_VALUE        142
+#define _APS_NEXT_COMMAND_VALUE         32781
+#define _APS_NEXT_CONTROL_VALUE         1412
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

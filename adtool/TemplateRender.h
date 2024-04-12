@@ -21,10 +21,14 @@ public:
 	// 渲染图片
 	// @param tempItem, 模板
 	// @param adSettings, 广告设置
+	// @param useDefaultAd, 标志是否使用默认广告，如果没有设置广告信息，默认刷白色
 	// @return 渲染图片的句柄，调用者负责释放
-	static HBITMAP Do(const CTemplateItem& tempItem, const CAdSettingItem adSettings[AD_TYPE_MAX]);
+	static HBITMAP Do(const CTemplateItem& tempItem, const CAdSettingItem adSettings[AD_TYPE_MAX], bool useDefaultAd);
 
 	// 按比例缩放图片
 	static HBITMAP ScaleBitmap(HBITMAP bitmap, float scaleFactor);
+
+private:
+	static void PaintAdRect(Gdiplus::Graphics& graphics, const CAdItem& ad);
 };
 

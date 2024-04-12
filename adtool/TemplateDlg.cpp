@@ -9,6 +9,7 @@
 #include "TemplateRender.h"
 #include "AdDlg.h"
 #include "ImPath.h"
+#include "GetTextDlg.h"
 
 #define WM_SHOW_MAX		WM_USER+100
 
@@ -50,6 +51,7 @@ BEGIN_MESSAGE_MAP(CTemplateDlg, CDialogEx)
 	ON_STN_CLICKED(IDC_PREVIEW_IMAGE, &CTemplateDlg::OnStnClickedPreviewImage)
 	ON_COMMAND(ID_AD_EDIT, &CTemplateDlg::OnAdEdit)
 	ON_COMMAND(ID_AD_DELETE, &CTemplateDlg::OnAdDelete)
+	ON_COMMAND(ID_TEMPLATE_PREVIEW_TEXT, &CTemplateDlg::OnTemplatePreviewText)
 END_MESSAGE_MAP()
 
 
@@ -104,7 +106,7 @@ void CTemplateDlg::UpdatePreviewCtrl()
 	}
 
 	// 渲染图片
-	HBITMAP bmp = CTemplateRender::Do(m_template, m_adSettings);
+	HBITMAP bmp = CTemplateRender::Do(m_template, m_adSettings, true);
 	if (bmp == NULL)
 	{
 		return;
@@ -459,6 +461,32 @@ void CTemplateDlg::OnAdDelete()
 		if (it->m_id == m_adId)
 		{
 			ads.erase(it);
+			break;
+		}
+	}
+
+	UpdatePreviewCtrl();
+}
+
+
+void CTemplateDlg::OnTemplatePreviewText()
+{
+	CGetTextDlg dlg;
+	dlg.m_strWndTitle = L"广告语";
+	dlg.m_textFieldName = L"预览文字";
+	if (dlg.DoModal() == IDCANCEL)
+	{
+		return;
+	}
+
+	auto& ads = m_template.m_ads;
+	for (auto it = ads.begin(); it != ads.end(); it++)
+	{
+		if (it->m_id == m_adId)
+		{
+			m_adSettings[it->m_type - 1].m_imageMode = false;
+			m_adSettings[it->m_type - 1].m_imageFilePath = L"";
+			m_adSettings[it->m_type - 1].m_textContent = (LPCTSTR)dlg.m_textContent;
 			break;
 		}
 	}

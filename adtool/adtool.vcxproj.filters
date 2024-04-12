@@ -78,6 +78,12 @@
     <ClInclude Include="AdDlg.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="GetTextDlg.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Utility\SerialNumberUtil.h">
+      <Filter>头文件\Utility</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="adtool.cpp">
@@ -124,6 +130,12 @@
     </ClCompile>
     <ClCompile Include="AdDlg.cpp">
       <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="GetTextDlg.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Utility\SerialNumberUtil.cpp">
+      <Filter>源文件\Utility</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

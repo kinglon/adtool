@@ -77,7 +77,7 @@ void CGenImageDlg::ThreadProc()
 			break;
 		}
 
-		HBITMAP bmp = CTemplateRender::Do(tempItem, m_adSettings);
+		HBITMAP bmp = CTemplateRender::Do(tempItem, m_adSettings, false);
 		if (bmp == NULL)
 		{
 			m_success = false;

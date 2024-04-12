@@ -30,7 +30,7 @@ private:
 	int m_imgOffsetX = 0;
 	int m_imgOffsetY = 0;
 
-	// 准备编辑或删除的广告
+	// 准备编辑或删除等操作的广告
 	std::wstring m_adId;
 
 private:
@@ -73,4 +73,5 @@ public:
 	afx_msg void OnStnClickedPreviewImage();
 	afx_msg void OnAdEdit();
 	afx_msg void OnAdDelete();
+	afx_msg void OnTemplatePreviewText();
 };

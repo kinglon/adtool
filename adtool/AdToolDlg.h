@@ -27,7 +27,9 @@ private:
 	std::vector<CAdItem> GetAdsFromTemplates(const std::vector<CTemplateItem>& templates);
 
 	// 从广告列表按规则生成一个模板
-	CTemplateItem MakeTemplateItemFromAds(const std::vector<CAdItem>& ads);
+	bool MakeTemplateItemFromAds(const std::vector<CAdItem>& ads, CTemplateItem& tempItem);
+
+	CLSID GetEncoderClsid(const WCHAR* format);
 
 	// 从界面获取广告输入设置
 	void GetAdSettings(CAdSettingItem adSettings[AD_TYPE_MAX]);

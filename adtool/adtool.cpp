@@ -10,10 +10,15 @@
 #include "LogUtil.h"
 #include "DumpUtil.h"
 #include "ImPath.h"
+#include "ImCharset.h"
 #include "SettingManager.h"
 #include <gdiplus.h>
+#include "GetTextDlg.h"
+#include <fstream>
+#include "SerialNumberUtil.h"
 
 using namespace Gdiplus;
+using namespace std;
 
 #pragma comment(lib, "gdiplus.lib") 
 
@@ -43,7 +48,49 @@ CAdToolApp::CAdToolApp()
 CAdToolApp theApp;
 CLogUtil* g_dllLog = nullptr;
 
-// CAdToolApp 初始化
+bool CheckSN()
+{
+	// 本地读取序列号
+	std::string sn;
+	std::wstring snFilePath = CImPath::GetLocalAppDataPath(APPNAME) + L"{B410BF0F-4A08-4971-8A29-45517306A784}";
+	ifstream file(snFilePath.c_str());	
+	if (file.is_open()) 
+	{
+		getline(file, sn);
+		file.close();
+	}
+	if (!sn.empty())
+	{
+		if (CSerialNumberUtil::IsValid(CImCharset::UTF8ToUnicode(sn.c_str())))
+		{
+			return true;
+		}
+	}
+
+	// 弹窗输入序列号
+	CGetTextDlg getTextDlg;
+	getTextDlg.m_strWndTitle = L"软件激活";
+	getTextDlg.m_textFieldName = L"注册码";
+	if (getTextDlg.DoModal() == IDCANCEL)
+	{
+		return false;
+	}
+	if (!CSerialNumberUtil::IsValid((LPCTSTR)getTextDlg.m_textContent))
+	{
+		MessageBox(NULL, L"序列号无效", L"提示", MB_OK);
+		return false;
+	}
+
+	// 保存序列号
+	ofstream of(snFilePath.c_str(), ios::trunc);
+	if (of.is_open()) 
+	{
+		of << (CImCharset::UnicodeToUTF8((LPCTSTR)getTextDlg.m_textContent).c_str());			
+		of.close();
+	}
+
+	return true;
+}
 
 BOOL CAdToolApp::InitInstance()
 {
@@ -90,8 +137,11 @@ BOOL CAdToolApp::InitInstance()
 	GdiplusStartupInput gdiplusStartupInput;
 	ULONG_PTR gdiplusToken;
 	GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, nullptr);
-
-	// todo by yejinlong, 注册码验证
+		
+	if (!CheckSN())
+	{
+		return FALSE;
+	}
 
 	CAdToolDlg dlg;
 	m_pMainWnd = &dlg;

@@ -61,16 +61,29 @@ std::wstring CImPath::GetSoftInstallPath()
     return strSoftInstallPath;
 }
 
-std::wstring CImPath::GetLocalAppDataPath()
+std::wstring CImPath::GetLocalAppDataPath(std::wstring appName)
 {
-	TCHAR szPath[MAX_PATH];
+    static std::wstring localAppDataPath = L"";
+    if (localAppDataPath.empty())
+    {
+        TCHAR szPath[MAX_PATH];
+        if (SHGetFolderPath(NULL, CSIDL_LOCAL_APPDATA, NULL, 0, szPath) == S_OK)
+        {
+            localAppDataPath = std::wstring(szPath) + L"\\";
+        }        
+    }
+    
+    if (localAppDataPath.empty())
+    {
+        return L"";
+    }
 
-	if (SHGetFolderPath(NULL, CSIDL_LOCAL_APPDATA, NULL, 0, szPath)!=S_OK)
-	{
-		return L"";
-	}
-
-	return std::wstring(szPath) + L"\\";
+    std::wstring dataPath = localAppDataPath + appName + L"\\";
+    if (!PathFileExists(dataPath.c_str()))
+    {
+        CreateDirectory(dataPath.c_str(), nullptr);
+    }
+    return dataPath;
 }
 
 std::wstring CImPath::GetAppDataRoamingPath()

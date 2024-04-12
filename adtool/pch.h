@@ -10,4 +10,7 @@
 // 添加要在此处预编译的标头
 #include "framework.h"
 #include "LogMacro.h"
+
+#define APPNAME  L"adtool"
+
 #endif //PCH_H
