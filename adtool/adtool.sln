@@ -5,6 +5,8 @@ VisualStudioVersion = 17.7.34031.279
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "adtool", "adtool.vcxproj", "{19B5AA2F-48A7-45A4-B02B-6AC540140034}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sntool", "..\sntool\sntool.vcxproj", "{8F10E019-C701-4859-8379-BBC361F12CBF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -21,6 +23,14 @@ Global
 		{19B5AA2F-48A7-45A4-B02B-6AC540140034}.Release|x64.Build.0 = Release|x64
 		{19B5AA2F-48A7-45A4-B02B-6AC540140034}.Release|x86.ActiveCfg = Release|Win32
 		{19B5AA2F-48A7-45A4-B02B-6AC540140034}.Release|x86.Build.0 = Release|Win32
+		{8F10E019-C701-4859-8379-BBC361F12CBF}.Debug|x64.ActiveCfg = Debug|x64
+		{8F10E019-C701-4859-8379-BBC361F12CBF}.Debug|x64.Build.0 = Debug|x64
+		{8F10E019-C701-4859-8379-BBC361F12CBF}.Debug|x86.ActiveCfg = Debug|Win32
+		{8F10E019-C701-4859-8379-BBC361F12CBF}.Debug|x86.Build.0 = Debug|Win32
+		{8F10E019-C701-4859-8379-BBC361F12CBF}.Release|x64.ActiveCfg = Release|x64
+		{8F10E019-C701-4859-8379-BBC361F12CBF}.Release|x64.Build.0 = Release|x64
+		{8F10E019-C701-4859-8379-BBC361F12CBF}.Release|x86.ActiveCfg = Release|Win32
+		{8F10E019-C701-4859-8379-BBC361F12CBF}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
