@@ -119,9 +119,6 @@ public:
 	// 图片生成保存路径
 	std::wstring m_savePath;
 
-	// 最大字体
-	int m_maxFontSize = 100;
-
 private:
 	// 备用广告名字
 	std::wstring m_backupAdNames[BACKUP_AD_COUNT];

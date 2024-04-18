@@ -98,6 +98,8 @@ void CTemplateDlg::RejustControlPos()
 		okCancelBtn[i]->MoveWindow(&rect);
 	}
 	Invalidate();
+
+	UpdatePreviewCtrl();
 }
 
 void CTemplateDlg::UpdatePreviewCtrl()
@@ -556,6 +558,8 @@ void CTemplateDlg::OnAdCopy()
 			break;
 		}
 	}
+
+	UpdatePreviewCtrl();
 }
 
 

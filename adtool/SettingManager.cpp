@@ -109,12 +109,7 @@ void CSettingManager::Load()
     if (root.isMember("save_path"))
     {
         m_savePath = CImCharset::UTF8ToUnicode(root["save_path"].asString().c_str());
-    }
-
-    if (root.isMember("max_font_size"))
-    {
-        m_maxFontSize = root["max_font_size"].asInt();
-    }
+    }   
 }
 
 void CSettingManager::Save()
@@ -157,7 +152,6 @@ void CSettingManager::Save()
     }
 
     root["save_path"] = CImCharset::UnicodeToUTF8(m_savePath.c_str());
-    root["max_font_size"] = m_maxFontSize;
 
     std::wstring strConfFilePath = CImPath::GetConfPath() + L"configs.json";
     std::ofstream outputFile(strConfFilePath);

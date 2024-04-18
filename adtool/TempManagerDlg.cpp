@@ -204,7 +204,7 @@ void CTempManagerDlg::OnBnClickedButtonExport()
 	{
 		return;
 	}
-	std::wstring exportPath = (LPCTSTR)folderPickerDlg.GetFileName();
+	std::wstring exportPath = (LPCTSTR)folderPickerDlg.GetPathName();
 
 	std::wstring dataPath = exportPath + L"\\data";
 	std::wstring configFilePath = exportPath + L"\\Configs\\configs.json";
@@ -298,4 +298,5 @@ void CTempManagerDlg::OnBnClickedButtonExport()
 	}
 
 	MessageBox(L"导入模板成功", L"提示", MB_OK);
+	InitControlData(CSettingManager::GetInstance()->m_templates);
 }

@@ -669,7 +669,7 @@ void CAdToolDlg::OnBnClickedGenImageBtn()
 	{
 		return;
 	}
-	savePath = folderPickerDlg.GetFileName();
+	savePath = folderPickerDlg.GetPathName();
 	CSettingManager::GetInstance()->Save();	
 
 	// 开始生成

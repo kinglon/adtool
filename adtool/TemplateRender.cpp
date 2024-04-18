@@ -148,58 +148,16 @@ HFONT CTemplateRender::CreateAdFont(const CAdItem& ad)
         desireHeight = ad.m_region.right - ad.m_region.left;
     }
 
-    int maxSize = CSettingManager::GetInstance()->m_maxFontSize;
-    int minSize = 1;
-    HFONT font = NULL;
-    while (true)
+    HFONT font = CreateFont(desireHeight * -1, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE, DEFAULT_CHARSET,
+        OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, 
+        ad.m_fontName.c_str());
+    if (font == NULL)
     {
-        if (font)
-        {
-            DeleteObject(font);
-        }
-
-        int middleSize = (maxSize + minSize) / 2;
-        font = CreateFont(middleSize*-1, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE, DEFAULT_CHARSET,
-            OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, ad.m_fontName.c_str());
-        if (font == NULL)
-        {
-            LOG_ERROR(L"failed to create the font (%s %dºÅ) ", ad.m_fontName.c_str(), middleSize);
-            return NULL;
-        }
-
-        HFONT oldFont = (HFONT)SelectObject(m_hdc, font);
-
-        SIZE size;
-        if (!GetTextExtentPoint32(m_hdc, L"Ìï", 1, &size))
-        {
-            LOG_ERROR(L"failed to call GetTextExtentPoint32, error is %d", GetLastError());
-            SelectObject(m_hdc, oldFont);
-            DeleteObject(font);
-            return NULL;
-        }
-
-        SelectObject(m_hdc, oldFont);
-
-        if (size.cy == desireHeight)
-        {
-            return font;
-        } 
-        else if (size.cy > desireHeight)
-        {
-            maxSize = middleSize;
-        }
-        else
-        {
-            minSize = middleSize;
-        }
-
-        if (minSize + 1 >= maxSize)
-        {
-            return font;
-        }
+        LOG_ERROR(L"failed to create the font (%s %dºÅ) ", ad.m_fontName.c_str(), desireHeight);
+        return NULL;
     }
 
-    return NULL;
+    return font;
 }
 
 void CTemplateRender::PaintAdRect(Gdiplus::Graphics& graphics, const CAdItem& ad)
