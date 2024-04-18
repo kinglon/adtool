@@ -2,6 +2,8 @@
 
 #include <string>
 #include <vector>
+#include <set>
+#include <sstream>
 
 // 备用广告数
 #define BACKUP_AD_COUNT			7 
@@ -15,6 +17,7 @@
 #define AD_ALIGN_BOTTOM			2
 #define AD_ALIGN_LEFT					3
 #define AD_ALIGN_RIGHT				4
+#define AD_ALIGN_CENTER			5
 
 // 字体
 #define FONT_FANGZHENG_DAHEI			L"方正大黑"
@@ -36,7 +39,7 @@ public:
 	int m_type = AD_TYPE_MIN;
 
 	// 图片对齐方式，1开始
-	int m_imageAlign = AD_ALIGN_TOP;
+	int m_imageAlign = AD_ALIGN_CENTER;
 
 	// 标识文字是水平还是垂直显示
 	bool m_bHorizon = true;
@@ -58,14 +61,31 @@ public:
 	// 模板名字
 	std::wstring m_name;
 
-	// 分组名字
-	std::wstring m_groupName;
+	// 分组名字，多个分组用竖线分隔
+	std::wstring m_groupNames;
 
 	// 位于data目录下
 	std::wstring m_imageFileName;	
 
 	// 广告
 	std::vector<CAdItem> m_ads;
+
+public:
+	// 获取分组列表
+	std::set<std::wstring> GetGroupList() const
+	{
+		std::set<std::wstring> groupList;
+		std::wstringstream ss(m_groupNames);
+		std::wstring token;
+		while (std::getline(ss, token, L'|'))
+		{
+			// Remove the space at the beginning and end of the token
+			token.erase(0, token.find_first_not_of(' '));
+			token.erase(token.find_last_not_of(' ') + 1);
+			groupList.insert(groupList.end(), token);
+		}
+		return groupList;
+	}
 };
 
 
@@ -83,9 +103,6 @@ public:
 	// 广告名字
 	void GetAdNames(std::wstring adNames[AD_TYPE_MAX]);
 
-	// 根据文字长度获取字体大小
-	int GetFontSize(int textLength);
-
 	void Save();
 
 private:
@@ -99,10 +116,13 @@ public:
 	// 模板列表
 	std::vector<CTemplateItem> m_templates;
 
+	// 图片生成保存路径
+	std::wstring m_savePath;
+
+	// 最大字体
+	int m_maxFontSize = 100;
+
 private:
 	// 备用广告名字
 	std::wstring m_backupAdNames[BACKUP_AD_COUNT];
-
-	// 字号与字长的关系
-	std::map<int, int> m_textLength2Fonts;
 };

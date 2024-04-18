@@ -201,6 +201,7 @@
     <ClInclude Include="framework.h" />
     <ClInclude Include="GenImageDlg.h" />
     <ClInclude Include="GetTextDlg.h" />
+    <ClInclude Include="MyStatic.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="SettingManager.h" />
@@ -223,6 +224,7 @@
     <ClCompile Include="AdToolDlg.cpp" />
     <ClCompile Include="GenImageDlg.cpp" />
     <ClCompile Include="GetTextDlg.cpp" />
+    <ClCompile Include="MyStatic.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

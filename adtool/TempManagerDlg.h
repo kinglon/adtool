@@ -35,4 +35,5 @@ public:
 	afx_msg void OnTemplateEdit();
 	afx_msg void OnTemplateDelete();
 	CEdit m_templateEdit;
+	afx_msg void OnBnClickedButtonExport();
 };

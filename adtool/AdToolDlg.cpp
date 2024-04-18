@@ -19,9 +19,6 @@ using namespace Gdiplus;
 #define new DEBUG_NEW
 #endif
 
-
-#define WM_SHOW_MAX  (WM_USER+100)
-
 #define PREVIEW_TEMP_IMAGE		L"preview_temp_image.jpg"
 
 class CAboutDlg : public CDialogEx
@@ -82,11 +79,33 @@ BEGIN_MESSAGE_MAP(CAdToolDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_PREVIEW_BTN, &CAdToolDlg::OnBnClickedPreviewBtn)
 	ON_WM_DROPFILES()
 	ON_BN_CLICKED(IDC_GEN_IMAGE_BTN, &CAdToolDlg::OnBnClickedGenImageBtn)
-	ON_WM_SHOWWINDOW()
 END_MESSAGE_MAP()
 
 
 void CAdToolDlg::InitControls()
+{
+	// 初始化分组列表
+	InitGroupControl();
+
+	// 初始化所有广告为图片模式
+	for (int controlId = IDC_AD_RADIO_1; controlId <= IDC_AD_RADIO_30; controlId++)
+	{
+		if ((controlId - IDC_AD_RADIO_1) % 2 == 0)
+		{
+			((CButton*)GetDlgItem(controlId))->SetCheck(BST_CHECKED);
+		}
+	}
+
+	// 初始化广告的名字
+	std::wstring adNames[AD_TYPE_MAX];
+	CSettingManager::GetInstance()->GetAdNames(adNames);;
+	for (int i = 0; i < AD_TYPE_MAX; i++)
+	{
+		GetDlgItem(IDC_AD_STATIC_1 + i)->SetWindowText(adNames[i].c_str());
+	}
+}
+
+void CAdToolDlg::RejustControlPos()
 {
 	// 调整控件的位置
 	CRect wndRect;
@@ -116,26 +135,6 @@ void CAdToolDlg::InitControls()
 		pChildWnd = pChildWnd->GetWindow(GW_HWNDNEXT);
 	}
 	Invalidate();
-
-	// 初始化分组列表
-	InitGroupControl();
-
-	// 初始化所有广告为图片模式
-	for (int controlId = IDC_AD_RADIO_1; controlId <= IDC_AD_RADIO_30; controlId++)
-	{
-		if ((controlId - IDC_AD_RADIO_1) % 2 == 0)
-		{
-			((CButton*)GetDlgItem(controlId))->SetCheck(BST_CHECKED);
-		}
-	}
-
-	// 初始化广告的名字
-	std::wstring adNames[AD_TYPE_MAX];
-	CSettingManager::GetInstance()->GetAdNames(adNames);;
-	for (int i = 0; i < AD_TYPE_MAX; i++)
-	{
-		GetDlgItem(IDC_AD_STATIC_1 + i)->SetWindowText(adNames[i].c_str());
-	}
 }
 
 void CAdToolDlg::InitGroupControl()
@@ -144,7 +143,11 @@ void CAdToolDlg::InitGroupControl()
 	auto& templates = CSettingManager::GetInstance()->m_templates;
 	for (const auto& item : templates)
 	{
-		groups.insert(groups.end(), item.m_groupName);
+		auto template_group_list = item.GetGroupList();
+		for (const auto& group : template_group_list)
+		{
+			groups.insert(groups.end(), group);
+		}
 	}
 
 	m_groupCombo.ResetContent();
@@ -165,9 +168,13 @@ std::vector<CTemplateItem> CAdToolDlg::GetTemplatesByGroupName(std::wstring grou
 	const auto& templates = CSettingManager::GetInstance()->m_templates;
 	for (const auto& item : templates)
 	{
-		if (item.m_groupName == groupName)
+		auto template_group_list = item.GetGroupList();
+		for (const auto& group : template_group_list)
 		{
-			result.push_back(item);
+			if (group == groupName)
+			{
+				result.push_back(item);
+			}
 		}
 	}
 
@@ -424,6 +431,9 @@ BOOL CAdToolDlg::OnInitDialog()
 	m_initSizeX = wndRect.Width();
 	m_initSizeY = wndRect.Height();
 
+	// 初始化控件状态
+	InitControls();
+
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
 
@@ -480,12 +490,6 @@ HCURSOR CAdToolDlg::OnQueryDragIcon()
 
 BOOL CAdToolDlg::PreTranslateMessage(MSG* pMsg)
 {
-	if (pMsg->message == WM_SHOW_MAX)
-	{
-		SendMessage(WM_SYSCOMMAND, SC_MAXIMIZE, 0);
-		return TRUE;
-	}
-
 	return CDialogEx::PreTranslateMessage(pMsg);
 }
 
@@ -494,13 +498,16 @@ void CAdToolDlg::OnSize(UINT nType, int cx, int cy)
 {
 	CDialogEx::OnSize(nType, cx, cy);
 
-	if (nType == SIZE_MAXIMIZED)
-	{		
-		if (m_firstMaximize)
-		{
-			m_firstMaximize = false;
-			InitControls();
-		}
+	if (cx == 0 || cy == 0 || m_initSizeX == 0 || m_initSizeY == 0)
+	{
+		return;
+	}
+
+	if (cx != m_initSizeX || cy != m_initSizeY)
+	{
+		RejustControlPos();
+		m_initSizeX = cx;
+		m_initSizeY = cy;
 	}
 }
 
@@ -651,42 +658,31 @@ void CAdToolDlg::OnBnClickedGenImageBtn()
 	}
 
 	// 选择保存路径
-	BROWSEINFO   bInfo;
-	ZeroMemory(&bInfo, sizeof(bInfo));
-	bInfo.hwndOwner = m_hWnd;	
-	bInfo.lpszTitle = _T("选择保存路径");
-	bInfo.ulFlags = BIF_RETURNONLYFSDIRS;
-	LPITEMIDLIST lpDlist = SHBrowseForFolder(&bInfo);   //显示选择对话框
-	if (lpDlist == NULL)
+	const wchar_t* lpszInitFolder = nullptr;
+	std::wstring& savePath = CSettingManager::GetInstance()->m_savePath;
+	if (!savePath.empty() && PathFileExists(savePath.c_str()))
+	{
+		lpszInitFolder = savePath.c_str();
+	}
+	CFolderPickerDialog folderPickerDlg(lpszInitFolder, 0, this, sizeof(OPENFILENAME));
+	if (folderPickerDlg.DoModal() == IDCANCEL)
 	{
 		return;
 	}
-
-	wchar_t savePath[MAX_PATH];
-	SHGetPathFromIDList(lpDlist, savePath); //把项目标识列表转化成目录
+	savePath = folderPickerDlg.GetFileName();
+	CSettingManager::GetInstance()->Save();	
 
 	// 开始生成
 	CGenImageDlg genImageDlg;
-	genImageDlg.SetParams(templates, adSettings, savePath);
+	genImageDlg.SetParams(templates, adSettings, savePath.c_str());
 	genImageDlg.DoModal();
 
 	if (genImageDlg.IsSuccess())
 	{
-		ShellExecute(NULL, L"open", savePath, NULL, NULL, SW_SHOW);
+		ShellExecute(NULL, L"open", savePath.c_str(), NULL, NULL, SW_SHOW);
 	}
 	else
 	{
 		MessageBox(L"图片生成失败", L"提示", MB_OK);
-	}
-}
-
-
-void CAdToolDlg::OnShowWindow(BOOL bShow, UINT nStatus)
-{
-	CDialogEx::OnShowWindow(bShow, nStatus);
-
-	if (bShow && m_firstMaximize)
-	{
-		PostMessage(WM_SHOW_MAX);
 	}
 }

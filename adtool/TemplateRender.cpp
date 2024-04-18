@@ -2,8 +2,15 @@
 #include "TemplateRender.h"
 #include "ImPath.h"
 
+HDC CTemplateRender::m_hdc = NULL;
+
 HBITMAP CTemplateRender::Do(const CTemplateItem& tempItem, const CAdSettingItem adSettings[AD_TYPE_MAX], bool useDefaultAd)
 {  
+    if (m_hdc == NULL)
+    {
+        m_hdc = GetDC(NULL);
+    }
+
     // Load the original image
     std::wstring imageFilePath = tempItem.m_imageFileName;
     if (imageFilePath.find(L':') == -1)  // 相对路径
@@ -67,6 +74,10 @@ HBITMAP CTemplateRender::Do(const CTemplateItem& tempItem, const CAdSettingItem 
                 destRect.X = ad.m_region.right - displayWidth;
                 destRect.Y = (adRegionHeight - displayHeight) / 2 + ad.m_region.top;
                 break;
+            case AD_ALIGN_CENTER:
+                destRect.X = (adRegionWidth - displayWidth) / 2 + ad.m_region.left;
+                destRect.Y = (adRegionHeight - displayHeight) / 2 + ad.m_region.top;
+                break;
             default:
                 break;
             }
@@ -89,8 +100,9 @@ HBITMAP CTemplateRender::Do(const CTemplateItem& tempItem, const CAdSettingItem 
             textColor.SetFromCOLORREF(CSettingManager::GetInstance()->m_textColor);
             Gdiplus::SolidBrush textBrush(textColor);
 
-            Gdiplus::Font textFont(ad.m_fontName.c_str(), (Gdiplus::REAL)CSettingManager::GetInstance()->GetFontSize(adSetting.m_textContent.length()));
-
+            HFONT adFont = CreateAdFont(ad);
+            Gdiplus::Font textFont(m_hdc, adFont);
+            
             Gdiplus::StringFormat stringFormat;
             stringFormat.SetAlignment(Gdiplus::StringAlignment::StringAlignmentCenter);
             if (!ad.m_bHorizon)
@@ -109,6 +121,8 @@ HBITMAP CTemplateRender::Do(const CTemplateItem& tempItem, const CAdSettingItem 
             Gdiplus::RectF layoutRect((Gdiplus::REAL)ad.m_region.left, (Gdiplus::REAL)ad.m_region.top,
                 (Gdiplus::REAL)(ad.m_region.right - ad.m_region.left), (Gdiplus::REAL)(ad.m_region.bottom - ad.m_region.top));
             graphics.DrawString(adSetting.m_textContent.c_str(), -1, &textFont, layoutRect, &stringFormat, &textBrush);
+
+            DeleteObject(adFont);
         }
     }
 
@@ -122,11 +136,81 @@ HBITMAP CTemplateRender::Do(const CTemplateItem& tempItem, const CAdSettingItem 
     return resultBmp;
 }
 
+HFONT CTemplateRender::CreateAdFont(const CAdItem& ad)
+{
+    int desireHeight = 0;
+    if (ad.m_bHorizon)
+    {
+        desireHeight = ad.m_region.bottom - ad.m_region.top;
+    }
+    else
+    {
+        desireHeight = ad.m_region.right - ad.m_region.left;
+    }
+
+    int maxSize = CSettingManager::GetInstance()->m_maxFontSize;
+    int minSize = 1;
+    HFONT font = NULL;
+    while (true)
+    {
+        if (font)
+        {
+            DeleteObject(font);
+        }
+
+        int middleSize = (maxSize + minSize) / 2;
+        font = CreateFont(middleSize*-1, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE, DEFAULT_CHARSET,
+            OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, ad.m_fontName.c_str());
+        if (font == NULL)
+        {
+            LOG_ERROR(L"failed to create the font (%s %d号) ", ad.m_fontName.c_str(), middleSize);
+            return NULL;
+        }
+
+        HFONT oldFont = (HFONT)SelectObject(m_hdc, font);
+
+        SIZE size;
+        if (!GetTextExtentPoint32(m_hdc, L"田", 1, &size))
+        {
+            LOG_ERROR(L"failed to call GetTextExtentPoint32, error is %d", GetLastError());
+            SelectObject(m_hdc, oldFont);
+            DeleteObject(font);
+            return NULL;
+        }
+
+        SelectObject(m_hdc, oldFont);
+
+        if (size.cy == desireHeight)
+        {
+            return font;
+        } 
+        else if (size.cy > desireHeight)
+        {
+            maxSize = middleSize;
+        }
+        else
+        {
+            minSize = middleSize;
+        }
+
+        if (minSize + 1 >= maxSize)
+        {
+            return font;
+        }
+    }
+
+    return NULL;
+}
+
 void CTemplateRender::PaintAdRect(Gdiplus::Graphics& graphics, const CAdItem& ad)
 {
+    // 画黑白相间框
     Gdiplus::Rect rect(ad.m_region.left, ad.m_region.top, ad.m_region.right - ad.m_region.left, ad.m_region.bottom - ad.m_region.top);
-    Gdiplus::SolidBrush brush(Gdiplus::Color::White);
-    graphics.FillRectangle(&brush, rect);
+    Gdiplus::Pen blackPen(Gdiplus::Color::Black, 3);
+    graphics.DrawRectangle(&blackPen, rect);
+    Gdiplus::Pen whitePen(Gdiplus::Color::White, 3);
+    whitePen.SetDashStyle(Gdiplus::DashStyleDash);
+    graphics.DrawRectangle(&whitePen, rect);
 }
 
 HBITMAP CTemplateRender::ScaleBitmap(HBITMAP bitmap, float scaleFactor)

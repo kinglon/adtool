@@ -30,5 +30,10 @@ public:
 
 private:
 	static void PaintAdRect(Gdiplus::Graphics& graphics, const CAdItem& ad);
+
+	static HFONT CreateAdFont(const CAdItem& ad);
+
+private:
+	static HDC m_hdc;
 };
 

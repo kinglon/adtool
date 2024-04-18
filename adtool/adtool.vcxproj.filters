@@ -84,6 +84,9 @@
     <ClInclude Include="Utility\SerialNumberUtil.h">
       <Filter>头文件\Utility</Filter>
     </ClInclude>
+    <ClInclude Include="MyStatic.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="adtool.cpp">
@@ -136,6 +139,9 @@
     </ClCompile>
     <ClCompile Include="Utility\SerialNumberUtil.cpp">
       <Filter>源文件\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="MyStatic.cpp">
+      <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

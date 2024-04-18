@@ -183,6 +183,8 @@
 #define IDC_STATIC_GROUPNAME            1409
 #define IDC_CHECK_TEXT                  1410
 #define IDC_STATIC_TITLE                1411
+#define IDC_STATIC_POSITION             1412
+#define IDC_BUTTON_EXPORT               1413
 #define ID_32771                        32771
 #define ID_32772                        32772
 #define ID_TEMPLATE_EDIT                32773
@@ -197,14 +199,18 @@
 #define ID_32782                        32782
 #define ID_AD_RREVIEW                   32783
 #define ID_AD_PREVIEW                   32784
+#define ID_32785                        32785
+#define ID_32786                        32786
+#define ID_AD_COPY                      32787
+#define ID_AD_PASTE                     32788
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        142
-#define _APS_NEXT_COMMAND_VALUE         32785
-#define _APS_NEXT_CONTROL_VALUE         1412
+#define _APS_NEXT_COMMAND_VALUE         32789
+#define _APS_NEXT_CONTROL_VALUE         1414
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

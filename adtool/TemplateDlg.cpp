@@ -35,6 +35,7 @@ void CTemplateDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_STATIC_GROUPNAME, m_groupNameStatic);
 	DDX_Control(pDX, IDOK, m_okBtn);
 	DDX_Control(pDX, IDCANCEL, m_cancelBtn);
+	DDX_Control(pDX, IDC_STATIC_POSITION, m_positionStatic);
 }
 
 
@@ -46,26 +47,36 @@ BEGIN_MESSAGE_MAP(CTemplateDlg, CDialogEx)
 	ON_STN_CLICKED(IDC_PREVIEW_IMAGE, &CTemplateDlg::OnStnClickedPreviewImage)
 	ON_COMMAND(ID_AD_EDIT, &CTemplateDlg::OnAdEdit)
 	ON_COMMAND(ID_AD_DELETE, &CTemplateDlg::OnAdDelete)
-	ON_WM_SHOWWINDOW()
 	ON_COMMAND(ID_AD_PREVIEW, &CTemplateDlg::OnAdPreview)
+	ON_COMMAND(ID_AD_COPY, &CTemplateDlg::OnAdCopy)
+	ON_WM_MOUSEMOVE()
 END_MESSAGE_MAP()
 
 
 void CTemplateDlg::InitControls()
+{
+	m_nameEdit.SetWindowText(m_template.m_name.c_str());
+	m_groupNameEdit.SetWindowText(m_template.m_groupNames.c_str());
+	m_previewImageCtrl.SetCallback(this);
+	UpdatePreviewCtrl();
+}
+
+void CTemplateDlg::RejustControlPos()
 {
 	// 调整控件的位置
 	CRect wndRect;
 	GetClientRect(&wndRect);
 	// 水平居中显示
 	int offsetX = (wndRect.Width() - m_initSizeX) / 2;
-	CWnd* controls[] = {&m_nameStatic, &m_nameEdit, &m_groupNameStatic, &m_groupNameEdit, &m_okBtn, &m_cancelBtn};
+	UINT controls[] = { IDC_STATIC_NAME , IDC_EDIT_NAME , IDC_STATIC_GROUPNAME , IDC_EDIT_GROUPNAME , IDOK , IDCANCEL, IDC_STATIC_POSITION };
 	for (int i = 0; i < ARRAYSIZE(controls); i++)
 	{
+		CWnd* ctrlWnd = GetDlgItem(controls[i]);
 		CRect rect;
-		controls[i]->GetWindowRect(&rect);
+		ctrlWnd->GetWindowRect(&rect);
 		ScreenToClient(&rect);
 		rect.OffsetRect(offsetX, 0);
-		controls[i]->MoveWindow(&rect);
+		ctrlWnd->MoveWindow(&rect);
 	}
 	// 预览控件撑满
 	CRect previewRect;
@@ -77,7 +88,7 @@ void CTemplateDlg::InitControls()
 	previewRect.bottom += heightChange;
 	m_previewImageCtrl.MoveWindow(&previewRect);
 	// 确定取消按钮往下移动
-	CWnd* okCancelBtn[] = {&m_okBtn, &m_cancelBtn};
+	CWnd* okCancelBtn[] = { &m_okBtn, &m_cancelBtn, &m_positionStatic };
 	for (int i = 0; i < ARRAYSIZE(okCancelBtn); i++)
 	{
 		CRect rect;
@@ -87,10 +98,6 @@ void CTemplateDlg::InitControls()
 		okCancelBtn[i]->MoveWindow(&rect);
 	}
 	Invalidate();
-	
-	m_nameEdit.SetWindowText(m_template.m_name.c_str());
-	m_groupNameEdit.SetWindowText(m_template.m_groupName.c_str());
-	UpdatePreviewCtrl();
 }
 
 void CTemplateDlg::UpdatePreviewCtrl()
@@ -242,6 +249,25 @@ void CTemplateDlg::HandleDropFile(HDROP hDropInfo)
 	UpdatePreviewCtrl();
 }
 
+void CTemplateDlg::OnStaticMouseMove(HWND hwnd, CPoint point)
+{
+	if (hwnd != m_previewImageCtrl.m_hWnd)
+	{
+		return;
+	}
+	
+	POINT pt;
+	pt.x = point.x;
+	pt.y = point.y;
+
+	// 转换为真实图片的位置
+	ImageCtrlToRealImage(&pt);
+
+	CString pos;
+	pos.Format(L"%d, %d", pt.x, pt.y);
+	m_positionStatic.SetWindowText(pos);
+}
+
 BOOL CTemplateDlg::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
@@ -255,6 +281,8 @@ BOOL CTemplateDlg::OnInitDialog()
 	GetClientRect(&wndRect);
 	m_initSizeX = wndRect.Width();
 	m_initSizeY = wndRect.Height();
+
+	InitControls();
 
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// 异常: OCX 属性页应返回 FALSE
@@ -271,12 +299,6 @@ void CTemplateDlg::OnDropFiles(HDROP hDropInfo)
 
 BOOL CTemplateDlg::PreTranslateMessage(MSG* pMsg)
 {
-	if (pMsg->message == WM_SHOW_MAX)
-	{
-		SendMessage(WM_SYSCOMMAND, SC_MAXIMIZE, 0);
-		return TRUE;
-	}
-
 	return CDialogEx::PreTranslateMessage(pMsg);
 }
 
@@ -285,13 +307,16 @@ void CTemplateDlg::OnSize(UINT nType, int cx, int cy)
 {
 	CDialogEx::OnSize(nType, cx, cy);
 
-	if (nType == SIZE_MAXIMIZED)
-	{		
-		if (m_firstMaximize)
-		{
-			m_firstMaximize = false;
-			InitControls();
-		}
+	if (cx == 0 || cy == 0 || m_initSizeX == 0 || m_initSizeY == 0)
+	{
+		return;
+	}
+
+	if (cx != m_initSizeX || cy != m_initSizeY)
+	{
+		RejustControlPos();
+		m_initSizeX = cx;
+		m_initSizeY = cy;
 	}
 }
 
@@ -344,7 +369,7 @@ void CTemplateDlg::OnBnClickedOk()
 
 	// 更新数据
 	m_template.m_name = (LPCTSTR)name;
-	m_template.m_groupName = (LPCTSTR)groupName;
+	m_template.m_groupNames = (LPCTSTR)groupName;
 
 	// 如果设置为外部图片，拷贝文件到data目录
 	if (m_template.m_imageFileName.find(L':') != -1)
@@ -372,6 +397,11 @@ void CTemplateDlg::OnBnClickedOk()
 	{
 		if (item.m_id == m_template.m_id)
 		{
+			// 如果图片不一样，要先删除原来的模板图片
+			if (item.m_imageFileName != m_template.m_imageFileName)
+			{
+				DeleteFile((CImPath::GetDataPath() + L"\\" + item.m_imageFileName).c_str());
+			}
 			item = m_template;
 			exist = true;
 			break;
@@ -485,17 +515,6 @@ void CTemplateDlg::OnAdDelete()
 	UpdatePreviewCtrl();
 }
 
-void CTemplateDlg::OnShowWindow(BOOL bShow, UINT nStatus)
-{
-	CDialogEx::OnShowWindow(bShow, nStatus);
-
-	if (bShow && m_firstMaximize)
-	{
-		PostMessage(WM_SHOW_MAX);
-	}
-}
-
-
 void CTemplateDlg::OnAdPreview()
 {
 	CGetTextDlg dlg;
@@ -519,4 +538,28 @@ void CTemplateDlg::OnAdPreview()
 	}
 
 	UpdatePreviewCtrl();
+}
+
+
+void CTemplateDlg::OnAdCopy()
+{
+	auto& ads = m_template.m_ads;
+	for (auto it = ads.begin(); it != ads.end(); it++)
+	{
+		if (it->m_id == m_adId)
+		{
+			auto newAd = *it;
+			newAd.m_id = CAdDlg::GetGuid();
+			newAd.m_region.top += 20;  // 向下偏移20
+			newAd.m_region.bottom += 20;
+			ads.insert(m_template.m_ads.begin(), newAd);  // 放在最上面
+			break;
+		}
+	}
+}
+
+
+void CTemplateDlg::OnMouseMove(UINT nFlags, CPoint point)
+{
+	CDialogEx::OnMouseMove(nFlags, point);
 }

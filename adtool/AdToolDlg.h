@@ -21,6 +21,9 @@ private:
 	// 初始化分组控件
 	void InitGroupControl();
 
+	// 窗口大小调整后，控件位置调整
+	void RejustControlPos();
+
 	std::vector<CTemplateItem> GetTemplatesByGroupName(std::wstring groupName);
 
 	// 从指定的模板中收集不同类别的广告（一个类别只收集一次)
@@ -41,9 +44,6 @@ private:
 	// 窗口初始大小
 	int m_initSizeX = 0;
 	int m_initSizeY = 0;
-
-	// 标志是否第一次手动最大化
-	bool m_firstMaximize = true;
 
 // 对话框数据
 #ifdef AFX_DESIGN_TIME
@@ -73,5 +73,4 @@ public:
 	CStatic m_previewImageCtrl;
 	afx_msg void OnDropFiles(HDROP hDropInfo);
 	afx_msg void OnBnClickedGenImageBtn();
-	afx_msg void OnShowWindow(BOOL bShow, UINT nStatus);
 };

@@ -75,6 +75,7 @@ void CAdDlg::InitControls()
 	m_comboImageAlign.AddString(L"下");
 	m_comboImageAlign.AddString(L"左");
 	m_comboImageAlign.AddString(L"右");
+	m_comboImageAlign.AddString(L"居中");
 
 	// 初始化字体
 	m_comboFont.Clear();

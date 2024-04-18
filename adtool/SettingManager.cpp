@@ -74,7 +74,7 @@ void CSettingManager::Load()
             CTemplateItem item;
             item.m_id = CImCharset::UTF8ToUnicode(value["id"].asString().c_str());
             item.m_name = CImCharset::UTF8ToUnicode(value["name"].asString().c_str());
-            item.m_groupName = CImCharset::UTF8ToUnicode(value["group_name"].asString().c_str());
+            item.m_groupNames = CImCharset::UTF8ToUnicode(value["group_name"].asString().c_str());
             item.m_imageFileName = CImCharset::UTF8ToUnicode(value["image_file"].asString().c_str());
             
             for (unsigned int j = 0; j < value["ad"].size(); j++)
@@ -106,14 +106,14 @@ void CSettingManager::Load()
         }
     }
 
-    if (root.isMember("text_length_font_size"))
+    if (root.isMember("save_path"))
     {
-        m_textLength2Fonts.clear();
-        for (unsigned int i = 0; i < root["text_length_font_size"].size(); i++)
-        {
-            auto& value = root["text_length_font_size"][i];
-            m_textLength2Fonts[value["text_length"].asInt()] = value["font_size"].asInt();
-        }
+        m_savePath = CImCharset::UTF8ToUnicode(root["save_path"].asString().c_str());
+    }
+
+    if (root.isMember("max_font_size"))
+    {
+        m_maxFontSize = root["max_font_size"].asInt();
     }
 }
 
@@ -131,7 +131,7 @@ void CSettingManager::Save()
         Json::Value value;
         value["id"] = CImCharset::UnicodeToUTF8(tempItem.m_id.c_str());
         value["name"] = CImCharset::UnicodeToUTF8(tempItem.m_name.c_str());
-        value["group_name"] = CImCharset::UnicodeToUTF8(tempItem.m_groupName.c_str());
+        value["group_name"] = CImCharset::UnicodeToUTF8(tempItem.m_groupNames.c_str());
         value["image_file"] = CImCharset::UnicodeToUTF8(tempItem.m_imageFileName.c_str());        
         for (auto& adItem : tempItem.m_ads)
         {
@@ -156,13 +156,8 @@ void CSettingManager::Save()
         root["backup_ad"].append(CImCharset::UnicodeToUTF8(item.c_str()));
     }
 
-    for (auto& item : m_textLength2Fonts)
-    {
-        Json::Value value;
-        value["text_length"] = item.first;
-        value["font_size"] = item.second;
-        root["text_length_font_size"].append(value);
-    }
+    root["save_path"] = CImCharset::UnicodeToUTF8(m_savePath.c_str());
+    root["max_font_size"] = m_maxFontSize;
 
     std::wstring strConfFilePath = CImPath::GetConfPath() + L"configs.json";
     std::ofstream outputFile(strConfFilePath);
@@ -193,21 +188,4 @@ void CSettingManager::GetAdNames(std::wstring adNames[AD_TYPE_MAX])
     {
         adNames[i] = m_backupAdNames[i-8];
     }
-}
-
-int CSettingManager::GetFontSize(int textLength)
-{
-    int distance = 1000;
-    int fontSize = 10;
-    for (const auto& item : m_textLength2Fonts)
-    {
-        int dis = abs(textLength - item.first);
-        if (dis < distance)
-        {
-            distance = dis;
-            fontSize = item.second;
-        }
-    }
-
-    return fontSize;
 }

@@ -2,10 +2,11 @@
 #include "afxdialogex.h"
 #include "SettingManager.h"
 #include "TemplateRender.h"
+#include "MyStatic.h"
 
 // CTemplateDlg 对话框
 
-class CTemplateDlg : public CDialogEx
+class CTemplateDlg : public CDialogEx, public IMyStaticCallback
 {
 	DECLARE_DYNAMIC(CTemplateDlg)
 
@@ -30,15 +31,15 @@ private:
 	int m_imgOffsetX = 0;
 	int m_imgOffsetY = 0;
 
-	// 准备编辑或删除等操作的广告
+	// 操作的广告对象
 	std::wstring m_adId;
-
-	// 标志是否第一次最大化
-	bool m_firstMaximize = true;
 
 private:
 	// 初始化控件，只调一次
 	void InitControls();
+
+	// 窗口大小调整后，控件位置调整
+	void RejustControlPos();
 
 	void UpdatePreviewCtrl();
 
@@ -49,6 +50,8 @@ private:
 	void ImageCtrlToRealImage(LPPOINT pt);
 
 	void HandleDropFile(HDROP hDrop);
+
+	void OnStaticMouseMove(HWND hwnd, CPoint point) override;
 
 // 对话框数据
 #ifdef AFX_DESIGN_TIME
@@ -62,7 +65,7 @@ protected:
 public:
 	CEdit m_nameEdit;
 	CEdit m_groupNameEdit;
-	CStatic m_previewImageCtrl;
+	CMyStatic m_previewImageCtrl;
 	virtual BOOL OnInitDialog();
 	afx_msg void OnDropFiles(HDROP hDropInfo);
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
@@ -76,6 +79,8 @@ public:
 	afx_msg void OnStnClickedPreviewImage();
 	afx_msg void OnAdEdit();
 	afx_msg void OnAdDelete();
-	afx_msg void OnShowWindow(BOOL bShow, UINT nStatus);
 	afx_msg void OnAdPreview();
+	afx_msg void OnAdCopy();
+	CStatic m_positionStatic;
+	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
 };
