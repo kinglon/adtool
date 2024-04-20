@@ -21,6 +21,9 @@ private:
 	// 初始化分组控件
 	void InitGroupControl();
 
+	// 初始化广告名字
+	void InitAdNames();
+
 	// 窗口大小调整后，控件位置调整
 	void RejustControlPos();
 
@@ -73,4 +76,5 @@ public:
 	CStatic m_previewImageCtrl;
 	afx_msg void OnDropFiles(HDROP hDropInfo);
 	afx_msg void OnBnClickedGenImageBtn();
+	afx_msg void OnBnClickedButtonSetting();
 };

@@ -18,7 +18,7 @@ std::wstring CSerialNumberUtil::GetSerialNumber()
 			sum += num[j][i];
 		}
 
-		num[2][i] = sum % 10;
+		num[2][i] = (sum+1) % 10;
 	}
 
 	// ×ªÎª×Ö·û
@@ -80,7 +80,7 @@ bool CSerialNumberUtil::IsValid(std::wstring sn)
 			sum += num[j][i];
 		}
 
-		if (num[2][i] != sum % 10)
+		if (num[2][i] != (sum+1) % 10)
 		{
 			return false;
 		}

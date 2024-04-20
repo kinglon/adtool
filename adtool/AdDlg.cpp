@@ -33,6 +33,9 @@ void CAdDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_CHECK_TEXT, m_checkVerShow);
 	DDX_Control(pDX, IDC_COMBO_FONT, m_comboFont);
 	DDX_Control(pDX, IDC_COMBO_TEXT_ALIGN, m_comboTextAlign);
+	DDX_Control(pDX, IDC_EDIT_R, m_editR);
+	DDX_Control(pDX, IDC_EDIT_G, m_editG);
+	DDX_Control(pDX, IDC_EDIT_B, m_editB);
 }
 
 
@@ -90,6 +93,7 @@ void CAdDlg::InitControls()
 	m_comboTextAlign.AddString(L"下");
 	m_comboTextAlign.AddString(L"左");
 	m_comboTextAlign.AddString(L"右");
+	m_comboTextAlign.AddString(L"居中");
 
 	// 初始化数据
 	if (m_ad.m_id.empty())  // 添加广告
@@ -114,6 +118,9 @@ void CAdDlg::InitControls()
 		m_comboFont.SelectString(-1, m_ad.m_fontName.c_str());
 		m_comboTextAlign.SetCurSel(m_ad.m_textAlign - 1);
 	}
+	m_editR.SetWindowText(std::to_wstring(GetRValue(m_ad.m_textColor)).c_str());
+	m_editG.SetWindowText(std::to_wstring(GetGValue(m_ad.m_textColor)).c_str());
+	m_editB.SetWindowText(std::to_wstring(GetBValue(m_ad.m_textColor)).c_str());
 }
 
 void CAdDlg::OnAdEdit()
@@ -182,20 +189,33 @@ void CAdDlg::OnBnClickedOk()
 	m_ad.m_fontName = text;
 	if (m_ad.m_bHorizon)
 	{
-		if (m_ad.m_textAlign != AD_ALIGN_TOP && m_ad.m_textAlign != AD_ALIGN_BOTTOM)
+		if (m_ad.m_textAlign != AD_ALIGN_LEFT && m_ad.m_textAlign != AD_ALIGN_RIGHT && m_ad.m_textAlign != AD_ALIGN_CENTER)
 		{
-			MessageBox(L"文字水平显示，请选择上对齐或下对齐", L"提示", MB_OK);
+			MessageBox(L"文字水平显示，请选择左对齐或右对齐或居中", L"提示", MB_OK);
 			return;
 		}
 	}
 	else
 	{
-		if (m_ad.m_textAlign != AD_ALIGN_LEFT && m_ad.m_textAlign != AD_ALIGN_RIGHT)
+		if (m_ad.m_textAlign != AD_ALIGN_TOP && m_ad.m_textAlign != AD_ALIGN_BOTTOM && m_ad.m_textAlign != AD_ALIGN_CENTER)
 		{
-			MessageBox(L"文字垂直显示，请选择左对齐或右对齐", L"提示", MB_OK);
+			MessageBox(L"文字垂直显示，请选择上对齐或下对齐或居中", L"提示", MB_OK);
 			return;
 		}
 	}
+
+	m_editR.GetWindowText(text);
+	int r = _wtoi(text);
+	m_editG.GetWindowText(text);
+	int g = _wtoi(text);
+	m_editB.GetWindowText(text);
+	int b = _wtoi(text);
+	if (r > 255 || g > 255 || b > 255)
+	{
+		MessageBox(L"无效的文字颜色", L"提示", MB_OK);
+		return;
+	}
+	m_ad.m_textColor = RGB(r, g, b);
 
 	if (m_ad.m_id.empty())
 	{

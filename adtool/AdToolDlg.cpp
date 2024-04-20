@@ -12,6 +12,7 @@
 #include <gdiplus.h>
 #include "GenImageDlg.h"
 #include "ImPath.h"
+#include "SettingDlg.h"
 
 using namespace Gdiplus;
 
@@ -79,6 +80,7 @@ BEGIN_MESSAGE_MAP(CAdToolDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_PREVIEW_BTN, &CAdToolDlg::OnBnClickedPreviewBtn)
 	ON_WM_DROPFILES()
 	ON_BN_CLICKED(IDC_GEN_IMAGE_BTN, &CAdToolDlg::OnBnClickedGenImageBtn)
+	ON_BN_CLICKED(IDC_BUTTON_SETTING, &CAdToolDlg::OnBnClickedButtonSetting)
 END_MESSAGE_MAP()
 
 
@@ -97,12 +99,7 @@ void CAdToolDlg::InitControls()
 	}
 
 	// 初始化广告的名字
-	std::wstring adNames[AD_TYPE_MAX];
-	CSettingManager::GetInstance()->GetAdNames(adNames);;
-	for (int i = 0; i < AD_TYPE_MAX; i++)
-	{
-		GetDlgItem(IDC_AD_STATIC_1 + i)->SetWindowText(adNames[i].c_str());
-	}
+	InitAdNames();
 }
 
 void CAdToolDlg::RejustControlPos()
@@ -159,6 +156,16 @@ void CAdToolDlg::InitGroupControl()
 	if (groups.size() > 0)
 	{
 		m_groupCombo.SetCurSel(0);
+	}
+}
+
+void CAdToolDlg::InitAdNames()
+{
+	std::wstring adNames[AD_TYPE_MAX];
+	CSettingManager::GetInstance()->GetAdNames(adNames);;
+	for (int i = 0; i < AD_TYPE_MAX; i++)
+	{
+		GetDlgItem(IDC_AD_STATIC_1 + i)->SetWindowText(adNames[i].c_str());
 	}
 }
 
@@ -685,4 +692,12 @@ void CAdToolDlg::OnBnClickedGenImageBtn()
 	{
 		MessageBox(L"图片生成失败", L"提示", MB_OK);
 	}
+}
+
+
+void CAdToolDlg::OnBnClickedButtonSetting()
+{
+	CSettingDlg dlg;
+	dlg.DoModal();
+	InitAdNames();
 }

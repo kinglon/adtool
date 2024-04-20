@@ -31,7 +31,8 @@ public:
 private:
 	static void PaintAdRect(Gdiplus::Graphics& graphics, const CAdItem& ad);
 
-	static HFONT CreateAdFont(const CAdItem& ad);
+	static HFONT CreateAdFont(const CAdItem& ad, const std::wstring& text, 
+		Gdiplus::Graphics* graphics, const Gdiplus::StringFormat* stringFormat);
 
 private:
 	static HDC m_hdc;

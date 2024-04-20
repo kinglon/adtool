@@ -97,27 +97,35 @@ HBITMAP CTemplateRender::Do(const CTemplateItem& tempItem, const CAdSettingItem 
             }
 
             Gdiplus::Color textColor;
-            textColor.SetFromCOLORREF(CSettingManager::GetInstance()->m_textColor);
-            Gdiplus::SolidBrush textBrush(textColor);
-
-            HFONT adFont = CreateAdFont(ad);
-            Gdiplus::Font textFont(m_hdc, adFont);
+            textColor.SetFromCOLORREF(ad.m_textColor);
+            Gdiplus::SolidBrush textBrush(textColor);            
             
             Gdiplus::StringFormat stringFormat;
-            stringFormat.SetAlignment(Gdiplus::StringAlignment::StringAlignmentCenter);
+            /*stringFormat.SetFormatFlags(stringFormat.GetFormatFlags() 
+                | Gdiplus::StringFormatFlags::StringFormatFlagsNoClip 
+                | Gdiplus::StringFormatFlags::StringFormatFlagsNoWrap);*/
             if (!ad.m_bHorizon)
             {
-                stringFormat.SetFormatFlags(Gdiplus::StringFormatFlags::StringFormatFlagsDirectionVertical);
+                stringFormat.SetFormatFlags(stringFormat.GetFormatFlags() |  Gdiplus::StringFormatFlags::StringFormatFlagsDirectionVertical);
             }
-            if (ad.m_textAlign == AD_ALIGN_LEFT || ad.m_textAlign == AD_ALIGN_TOP)
+
+            if (ad.m_textAlign == AD_ALIGN_CENTER)
+            {
+                stringFormat.SetAlignment(Gdiplus::StringAlignment::StringAlignmentCenter);
+            }
+            else if (ad.m_textAlign == AD_ALIGN_LEFT || ad.m_textAlign == AD_ALIGN_TOP)
             {                
-                stringFormat.SetLineAlignment(Gdiplus::StringAlignment::StringAlignmentNear);                
+                stringFormat.SetAlignment(Gdiplus::StringAlignment::StringAlignmentNear);
+                // stringFormat.SetLineAlignment(Gdiplus::StringAlignment::StringAlignmentNear);                
             }
             else
             {
-                stringFormat.SetLineAlignment(Gdiplus::StringAlignment::StringAlignmentFar);
+                stringFormat.SetAlignment(Gdiplus::StringAlignment::StringAlignmentFar);
+                // stringFormat.SetLineAlignment(Gdiplus::StringAlignment::StringAlignmentFar);
             }
-           
+
+            HFONT adFont = CreateAdFont(ad, adSetting.m_textContent, &graphics, &stringFormat);
+            Gdiplus::Font textFont(m_hdc, adFont);           
             Gdiplus::RectF layoutRect((Gdiplus::REAL)ad.m_region.left, (Gdiplus::REAL)ad.m_region.top,
                 (Gdiplus::REAL)(ad.m_region.right - ad.m_region.left), (Gdiplus::REAL)(ad.m_region.bottom - ad.m_region.top));
             graphics.DrawString(adSetting.m_textContent.c_str(), -1, &textFont, layoutRect, &stringFormat, &textBrush);
@@ -136,37 +144,95 @@ HBITMAP CTemplateRender::Do(const CTemplateItem& tempItem, const CAdSettingItem 
     return resultBmp;
 }
 
-HFONT CTemplateRender::CreateAdFont(const CAdItem& ad)
+HFONT CTemplateRender::CreateAdFont(const CAdItem& ad, const std::wstring& text, 
+    Gdiplus::Graphics* graphics, const Gdiplus::StringFormat* stringFormat)
 {
-    int desireHeight = 0;
-    if (ad.m_bHorizon)
+    if (text.empty())
     {
-        desireHeight = ad.m_region.bottom - ad.m_region.top;
-    }
-    else
-    {
-        desireHeight = ad.m_region.right - ad.m_region.left;
-    }
-
-    HFONT font = CreateFont(desireHeight * -1, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE, DEFAULT_CHARSET,
-        OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, 
-        ad.m_fontName.c_str());
-    if (font == NULL)
-    {
-        LOG_ERROR(L"failed to create the font (%s %d号) ", ad.m_fontName.c_str(), desireHeight);
         return NULL;
     }
 
-    return font;
+    int adWidth = ad.m_region.right - ad.m_region.left;
+    int adHeight = ad.m_region.bottom - ad.m_region.top;
+   
+    // 横着显示，在[1, 高度]之间使用二分法寻找一个字号使得整个字符串宽度在广告区内
+    // 竖着显示，在[1, 宽度]之间使用二分法寻找一个字号使得整个字符串高度在广告区内
+    int maxSize = 1;
+    int minSize = 1;
+    if (ad.m_bHorizon)
+    {
+        maxSize = adHeight;
+    }
+    else
+    {
+        maxSize = adWidth;
+    }
+
+    HFONT desiredFont = NULL;
+    while (true)
+    {
+        // 创建字体
+        int middleSize = (maxSize + minSize) / 2;
+        HFONT font = CreateFont(middleSize * -1, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE, DEFAULT_CHARSET,
+            OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, ad.m_fontName.c_str());
+        if (font == NULL)
+        {
+            LOG_ERROR(L"failed to create the font (%s %d号) ", ad.m_fontName.c_str(), middleSize);
+            return desiredFont;
+        }
+
+        // 计算文本占用空间        
+        Gdiplus::RectF boundingBox;
+        Gdiplus::Font gdiFont(m_hdc, font);
+        Gdiplus::Status status = graphics->MeasureString(text.c_str(), text.length(), &gdiFont,
+            Gdiplus::PointF(0, 0), stringFormat, &boundingBox);        
+        if (status != Gdiplus::Ok)
+        {
+            LOG_ERROR(L"failed to call MeasureString, error is 0x%x", status);
+            DeleteObject(font);
+            return desiredFont;
+        }
+
+        // 判断是否能显示得下
+        bool enough = true;
+        if (ad.m_bHorizon && boundingBox.Width > (Gdiplus::REAL)adWidth)
+        {
+            enough = false;
+        }
+        else if (!ad.m_bHorizon && boundingBox.Height > (Gdiplus::REAL)adHeight)
+        {
+            enough = false;
+        }
+
+        // 继续二分法查找
+        if (!enough)  // 显示不下
+        {
+            DeleteObject(font);
+            maxSize = middleSize;
+        }
+        else // 显示得下
+        {
+            DeleteObject(desiredFont);
+            desiredFont = font;
+            minSize = middleSize;
+        }
+
+        if (minSize + 1 >= maxSize)  // 查找结束
+        {
+            return desiredFont;
+        }
+    }
+
+    return NULL;
 }
 
 void CTemplateRender::PaintAdRect(Gdiplus::Graphics& graphics, const CAdItem& ad)
 {
     // 画黑白相间框
     Gdiplus::Rect rect(ad.m_region.left, ad.m_region.top, ad.m_region.right - ad.m_region.left, ad.m_region.bottom - ad.m_region.top);
-    Gdiplus::Pen blackPen(Gdiplus::Color::Black, 3);
+    Gdiplus::Pen blackPen(Gdiplus::Color::Black, 6);
     graphics.DrawRectangle(&blackPen, rect);
-    Gdiplus::Pen whitePen(Gdiplus::Color::White, 3);
+    Gdiplus::Pen whitePen(Gdiplus::Color::White, 6);
     whitePen.SetDashStyle(Gdiplus::DashStyleDash);
     graphics.DrawRectangle(&whitePen, rect);
 }

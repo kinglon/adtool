@@ -55,15 +55,7 @@ void CSettingManager::Load()
     if (root.isMember("log_level"))
     {
         m_nLogLevel = root["log_level"].asInt();
-    }
-
-    if (root.isMember("text_color"))
-    {
-        int r = root["text_color"]["r"].asInt();
-        int g = root["text_color"]["g"].asInt();
-        int b = root["text_color"]["b"].asInt();
-        m_textColor = RGB(r, g, b);
-    }
+    }    
 
     if (root.isMember("template"))
     {
@@ -91,6 +83,13 @@ void CSettingManager::Load()
                 adItem.m_fontName = CImCharset::UTF8ToUnicode(adValue["font_name"].asString().c_str());
                 adItem.m_imageAlign = adValue["image_align"].asInt();
                 adItem.m_textAlign = adValue["text_align"].asInt();
+                if (adValue.isMember("text_color"))
+                {
+                    int r = adValue["text_color"]["r"].asInt();
+                    int g = adValue["text_color"]["g"].asInt();
+                    int b = adValue["text_color"]["b"].asInt();
+                    adItem.m_textColor = RGB(r, g, b);
+                }
                 item.m_ads.push_back(adItem);
             }
 
@@ -117,10 +116,6 @@ void CSettingManager::Save()
     Json::Value root = Json::objectValue;
     root["log_level"] = m_nLogLevel;
 
-    root["text_color"]["r"] = GetRValue(m_textColor);
-    root["text_color"]["g"] = GetGValue(m_textColor);
-    root["text_color"]["b"] = GetBValue(m_textColor);
-
     for (auto& tempItem : m_templates)
     {
         Json::Value value;
@@ -141,6 +136,9 @@ void CSettingManager::Save()
             adValue["font_name"] = CImCharset::UnicodeToUTF8(adItem.m_fontName.c_str());
             adValue["image_align"] = adItem.m_imageAlign;
             adValue["text_align"] = adItem.m_textAlign;
+            adValue["text_color"]["r"] = GetRValue(adItem.m_textColor);
+            adValue["text_color"]["g"] = GetGValue(adItem.m_textColor);
+            adValue["text_color"]["b"] = GetBValue(adItem.m_textColor);
             value["ad"].append(adValue);
         }
         root["template"].append(value);

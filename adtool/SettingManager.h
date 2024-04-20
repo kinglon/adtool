@@ -20,9 +20,9 @@
 #define AD_ALIGN_CENTER			5
 
 // 字体
-#define FONT_FANGZHENG_DAHEI			L"方正大黑"
-#define FONT_FANGZHENG_ZONGYI			L"方正综艺"
-#define FONT_FANGZHENG_XINGKAI		L"方正行楷"
+#define FONT_FANGZHENG_DAHEI			L"方正大黑简体"
+#define FONT_FANGZHENG_ZONGYI			L"方正综艺简体"
+#define FONT_FANGZHENG_XINGKAI		L"方正行楷简体"
 #define FONT_FANGZHENG_JIANTI			L"方正正中黑简体"
 
 // 广告位
@@ -49,6 +49,9 @@ public:
 
 	// 文字对齐方式，1开始
 	int m_textAlign = AD_ALIGN_TOP;
+
+	// 字体颜色
+	COLORREF m_textColor = RGB(255, 255, 255);
 };
 
 // 模板
@@ -109,9 +112,7 @@ private:
 	void Load();
 
 public:
-	int m_nLogLevel = 2;  // debug	
-
-	COLORREF m_textColor = RGB(255, 255, 255);
+	int m_nLogLevel = 2;  // debug		
 
 	// 模板列表
 	std::vector<CTemplateItem> m_templates;
@@ -119,7 +120,6 @@ public:
 	// 图片生成保存路径
 	std::wstring m_savePath;
 
-private:
 	// 备用广告名字
 	std::wstring m_backupAdNames[BACKUP_AD_COUNT];
 };

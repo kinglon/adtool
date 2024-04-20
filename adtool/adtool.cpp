@@ -122,6 +122,13 @@ BOOL CAdToolApp::InitInstance()
 		return FALSE;
 	}
 
+	CTime now = CTime::GetCurrentTime();
+	CTime expired(2024, 5, 5, 0, 0, 0);
+	if (now >= expired)
+	{
+		return FALSE;
+	}
+
 	CoInitialize(nullptr);
 
 	g_dllLog = CLogUtil::GetLog(L"main");

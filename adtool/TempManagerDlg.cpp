@@ -292,7 +292,24 @@ void CTempManagerDlg::OnBnClickedButtonExport()
 				item.m_ads.push_back(adItem);
 			}
 
-			templates.push_back(item);
+			bool exist = false;
+			for (auto& oldTemplate : templates)
+			{
+				if (oldTemplate.m_id == item.m_id)
+				{
+					exist = true;
+					if (oldTemplate.m_imageFileName != item.m_imageFileName)
+					{
+						DeleteFile((CImPath::GetDataPath() + L"\\" + oldTemplate.m_imageFileName).c_str());
+					}
+					oldTemplate = item;
+					break;
+				}				
+			}
+			if (!exist)
+			{
+				templates.push_back(item);
+			}
 		}
 		CSettingManager::GetInstance()->Save();
 	}

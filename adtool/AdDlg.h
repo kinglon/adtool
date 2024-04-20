@@ -45,4 +45,7 @@ public:
 	CComboBox m_comboTextAlign;
 	virtual BOOL OnInitDialog();
 	afx_msg void OnBnClickedOk();
+	CEdit m_editR;
+	CEdit m_editG;
+	CEdit m_editB;
 };

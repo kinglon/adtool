@@ -14,10 +14,12 @@
 #define IDD_AD_DIALOG                   137
 #define IDR_MENU_AD                     139
 #define IDD_GET_TEXT_DIALOG             140
+#define IDD_SETTING_DIALOG              142
 #define IDC_TEMPLATE_MANAGER_BTN        1000
 #define IDC_COMBO1                      1001
 #define IDC_GROUP_COMBO                 1001
 #define IDC_COMBO_TYPE                  1001
+#define IDC_COMBO_ADNAME                1001
 #define IDC_SETTING_BTN                 1002
 #define IDC_COMBO_IMAGE_ALIGN           1002
 #define IDC_RADIO1                      1003
@@ -30,6 +32,7 @@
 #define IDC_EDIT_NAME                   1005
 #define IDC_EDIT_X                      1005
 #define IDC_EDIT_TEXT                   1005
+#define IDC_EDIT_ADNAME                 1005
 #define IDC_EDIT2                       1006
 #define IDC_EDIT_TEMPLATE               1006
 #define IDC_EDIT_GROUPNAME              1006
@@ -39,8 +42,11 @@
 #define IDC_RADIO4                      1008
 #define IDC_EDIT_HEIGHT                 1008
 #define IDC_EDIT3                       1009
+#define IDC_EDIT_R                      1009
 #define IDC_EDIT4                       1010
+#define IDC_EDIT_G                      1010
 #define IDC_RADIO5                      1011
+#define IDC_EDIT_B                      1011
 #define IDC_RADIO6                      1012
 #define IDC_EDIT5                       1013
 #define IDC_EDIT6                       1014
@@ -185,6 +191,8 @@
 #define IDC_STATIC_TITLE                1411
 #define IDC_STATIC_POSITION             1412
 #define IDC_BUTTON_EXPORT               1413
+#define IDC_BUTTON_MODIFY_AD            1414
+#define IDC_BUTTON_SETTING              1415
 #define ID_32771                        32771
 #define ID_32772                        32772
 #define ID_TEMPLATE_EDIT                32773
@@ -208,9 +216,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        142
+#define _APS_NEXT_RESOURCE_VALUE        144
 #define _APS_NEXT_COMMAND_VALUE         32789
-#define _APS_NEXT_CONTROL_VALUE         1414
+#define _APS_NEXT_CONTROL_VALUE         1416
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

@@ -87,6 +87,9 @@
     <ClInclude Include="MyStatic.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="SettingDlg.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="adtool.cpp">
@@ -141,6 +144,9 @@
       <Filter>源文件\Utility</Filter>
     </ClCompile>
     <ClCompile Include="MyStatic.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="SettingDlg.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
