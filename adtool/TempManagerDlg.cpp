@@ -289,6 +289,10 @@ void CTempManagerDlg::OnBnClickedButtonExport()
 				adItem.m_fontName = CImCharset::UTF8ToUnicode(adValue["font_name"].asString().c_str());
 				adItem.m_imageAlign = adValue["image_align"].asInt();
 				adItem.m_textAlign = adValue["text_align"].asInt();
+				if (adValue.isMember("text_valign"))
+				{
+					adItem.m_textVerAlign = adValue["text_valign"].asInt();
+				}
 				item.m_ads.push_back(adItem);
 			}
 

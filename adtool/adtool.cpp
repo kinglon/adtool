@@ -120,14 +120,7 @@ BOOL CAdToolApp::InitInstance()
 	{
 		AfxMessageBox(L"程序已经在运行");
 		return FALSE;
-	}
-
-	CTime now = CTime::GetCurrentTime();
-	CTime expired(2024, 5, 5, 0, 0, 0);
-	if (now >= expired)
-	{
-		return FALSE;
-	}
+	}	
 
 	CoInitialize(nullptr);
 

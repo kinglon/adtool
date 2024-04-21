@@ -47,8 +47,11 @@ public:
 	// 字体
 	std::wstring m_fontName = FONT_FANGZHENG_DAHEI;
 
-	// 文字对齐方式，1开始
-	int m_textAlign = AD_ALIGN_TOP;
+	// 文字水平对齐方式，1开始
+	int m_textAlign = AD_ALIGN_CENTER;
+
+	// 文字垂直对齐方式，1开始
+	int m_textVerAlign = AD_ALIGN_CENTER;
 
 	// 字体颜色
 	COLORREF m_textColor = RGB(255, 255, 255);

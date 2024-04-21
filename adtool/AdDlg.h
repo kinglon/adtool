@@ -48,4 +48,5 @@ public:
 	CEdit m_editR;
 	CEdit m_editG;
 	CEdit m_editB;
+	CComboBox m_comboVerAlign;
 };

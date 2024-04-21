@@ -100,28 +100,63 @@ HBITMAP CTemplateRender::Do(const CTemplateItem& tempItem, const CAdSettingItem 
             textColor.SetFromCOLORREF(ad.m_textColor);
             Gdiplus::SolidBrush textBrush(textColor);            
             
-            Gdiplus::StringFormat stringFormat;
-            /*stringFormat.SetFormatFlags(stringFormat.GetFormatFlags() 
-                | Gdiplus::StringFormatFlags::StringFormatFlagsNoClip 
-                | Gdiplus::StringFormatFlags::StringFormatFlagsNoWrap);*/
-            if (!ad.m_bHorizon)
+            Gdiplus::StringFormat stringFormat;  
+            if (ad.m_bHorizon)
             {
-                stringFormat.SetFormatFlags(stringFormat.GetFormatFlags() |  Gdiplus::StringFormatFlags::StringFormatFlagsDirectionVertical);
-            }
+                if (ad.m_textAlign == AD_ALIGN_LEFT)
+                {
+                    stringFormat.SetAlignment(Gdiplus::StringAlignment::StringAlignmentNear);
+                }
+                else if (ad.m_textAlign == AD_ALIGN_RIGHT)
+                {
+                    stringFormat.SetAlignment(Gdiplus::StringAlignment::StringAlignmentFar);
+                }
+                else
+                {
+                    stringFormat.SetAlignment(Gdiplus::StringAlignment::StringAlignmentCenter);
+                }
 
-            if (ad.m_textAlign == AD_ALIGN_CENTER)
-            {
-                stringFormat.SetAlignment(Gdiplus::StringAlignment::StringAlignmentCenter);
-            }
-            else if (ad.m_textAlign == AD_ALIGN_LEFT || ad.m_textAlign == AD_ALIGN_TOP)
-            {                
-                stringFormat.SetAlignment(Gdiplus::StringAlignment::StringAlignmentNear);
-                // stringFormat.SetLineAlignment(Gdiplus::StringAlignment::StringAlignmentNear);                
+                if (ad.m_textVerAlign == AD_ALIGN_TOP)
+                {
+                    stringFormat.SetLineAlignment(Gdiplus::StringAlignment::StringAlignmentNear);
+                }
+                else if (ad.m_textVerAlign == AD_ALIGN_BOTTOM)
+                {
+                    stringFormat.SetLineAlignment(Gdiplus::StringAlignment::StringAlignmentFar);
+                }
+                else
+                {
+                    stringFormat.SetLineAlignment(Gdiplus::StringAlignment::StringAlignmentCenter);
+                }
             }
             else
             {
-                stringFormat.SetAlignment(Gdiplus::StringAlignment::StringAlignmentFar);
-                // stringFormat.SetLineAlignment(Gdiplus::StringAlignment::StringAlignmentFar);
+                stringFormat.SetFormatFlags(stringFormat.GetFormatFlags() | Gdiplus::StringFormatFlags::StringFormatFlagsDirectionVertical);
+                if (ad.m_textVerAlign == AD_ALIGN_TOP)
+                {
+                    stringFormat.SetAlignment(Gdiplus::StringAlignment::StringAlignmentNear);
+                }
+                else if (ad.m_textVerAlign == AD_ALIGN_BOTTOM)
+                {
+                    stringFormat.SetAlignment(Gdiplus::StringAlignment::StringAlignmentFar);
+                }
+                else
+                {
+                    stringFormat.SetAlignment(Gdiplus::StringAlignment::StringAlignmentCenter);
+                }
+
+                if (ad.m_textAlign == AD_ALIGN_LEFT)
+                {
+                    stringFormat.SetLineAlignment(Gdiplus::StringAlignment::StringAlignmentNear);
+                }
+                else if (ad.m_textAlign == AD_ALIGN_RIGHT)
+                {
+                    stringFormat.SetLineAlignment(Gdiplus::StringAlignment::StringAlignmentFar);
+                }
+                else
+                {
+                    stringFormat.SetLineAlignment(Gdiplus::StringAlignment::StringAlignmentCenter);
+                }                
             }
 
             HFONT adFont = CreateAdFont(ad, adSetting.m_textContent, &graphics, &stringFormat);
@@ -199,7 +234,7 @@ HFONT CTemplateRender::CreateAdFont(const CAdItem& ad, const std::wstring& text,
         {
             enough = false;
         }
-        else if (!ad.m_bHorizon && boundingBox.Height > (Gdiplus::REAL)adHeight)
+        else if (!ad.m_bHorizon && (boundingBox.Height > (Gdiplus::REAL)adHeight || boundingBox.Width > (Gdiplus::REAL)adWidth))
         {
             enough = false;
         }

@@ -83,6 +83,10 @@ void CSettingManager::Load()
                 adItem.m_fontName = CImCharset::UTF8ToUnicode(adValue["font_name"].asString().c_str());
                 adItem.m_imageAlign = adValue["image_align"].asInt();
                 adItem.m_textAlign = adValue["text_align"].asInt();
+                if (adValue.isMember("text_valign"))
+                {
+                    adItem.m_textVerAlign = adValue["text_valign"].asInt();
+                }
                 if (adValue.isMember("text_color"))
                 {
                     int r = adValue["text_color"]["r"].asInt();
@@ -136,6 +140,7 @@ void CSettingManager::Save()
             adValue["font_name"] = CImCharset::UnicodeToUTF8(adItem.m_fontName.c_str());
             adValue["image_align"] = adItem.m_imageAlign;
             adValue["text_align"] = adItem.m_textAlign;
+            adValue["text_valign"] = adItem.m_textVerAlign;
             adValue["text_color"]["r"] = GetRValue(adItem.m_textColor);
             adValue["text_color"]["g"] = GetGValue(adItem.m_textColor);
             adValue["text_color"]["b"] = GetBValue(adItem.m_textColor);

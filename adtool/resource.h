@@ -48,6 +48,8 @@
 #define IDC_RADIO5                      1011
 #define IDC_EDIT_B                      1011
 #define IDC_RADIO6                      1012
+#define IDC_COMBO_TEXT_ALIGN2           1012
+#define IDC_COMBO_TEXT_VER_ALIGN        1012
 #define IDC_EDIT5                       1013
 #define IDC_EDIT6                       1014
 #define IDC_RADIO7                      1015

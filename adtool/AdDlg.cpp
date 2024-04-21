@@ -36,6 +36,7 @@ void CAdDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_EDIT_R, m_editR);
 	DDX_Control(pDX, IDC_EDIT_G, m_editG);
 	DDX_Control(pDX, IDC_EDIT_B, m_editB);
+	DDX_Control(pDX, IDC_COMBO_TEXT_VER_ALIGN, m_comboVerAlign);
 }
 
 
@@ -87,13 +88,17 @@ void CAdDlg::InitControls()
 	m_comboFont.AddString(FONT_FANGZHENG_XINGKAI);
 	m_comboFont.AddString(FONT_FANGZHENG_JIANTI);
 
-	// 文字对齐
+	// 文字水平对齐
 	m_comboTextAlign.Clear();
-	m_comboTextAlign.AddString(L"上");
-	m_comboTextAlign.AddString(L"下");
-	m_comboTextAlign.AddString(L"左");
-	m_comboTextAlign.AddString(L"右");
 	m_comboTextAlign.AddString(L"居中");
+	m_comboTextAlign.AddString(L"左");
+	m_comboTextAlign.AddString(L"右");	
+
+	// 文字垂直对齐
+	m_comboVerAlign.Clear();
+	m_comboVerAlign.AddString(L"居中");
+	m_comboVerAlign.AddString(L"上");
+	m_comboVerAlign.AddString(L"下");	
 
 	// 初始化数据
 	if (m_ad.m_id.empty())  // 添加广告
@@ -102,6 +107,7 @@ void CAdDlg::InitControls()
 		m_comboImageAlign.SetCurSel(0);
 		m_comboFont.SetCurSel(0);
 		m_comboTextAlign.SetCurSel(0);
+		m_comboVerAlign.SetCurSel(0);
 	}
 	else
 	{
@@ -116,7 +122,31 @@ void CAdDlg::InitControls()
 			m_checkVerShow.SetCheck(BST_CHECKED);
 		}
 		m_comboFont.SelectString(-1, m_ad.m_fontName.c_str());
-		m_comboTextAlign.SetCurSel(m_ad.m_textAlign - 1);
+		if (m_ad.m_textAlign == AD_ALIGN_LEFT)
+		{
+			m_comboTextAlign.SetCurSel(1);
+		}
+		else if (m_ad.m_textAlign == AD_ALIGN_RIGHT)
+		{
+			m_comboTextAlign.SetCurSel(2);
+		}
+		else
+		{
+			m_comboTextAlign.SetCurSel(0);
+		}
+		
+		if (m_ad.m_textVerAlign == AD_ALIGN_TOP)
+		{
+			m_comboVerAlign.SetCurSel(1);
+		}
+		else if (m_ad.m_textVerAlign == AD_ALIGN_BOTTOM)
+		{
+			m_comboVerAlign.SetCurSel(2);
+		}
+		else
+		{
+			m_comboVerAlign.SetCurSel(0);
+		}
 	}
 	m_editR.SetWindowText(std::to_wstring(GetRValue(m_ad.m_textColor)).c_str());
 	m_editG.SetWindowText(std::to_wstring(GetGValue(m_ad.m_textColor)).c_str());
@@ -183,25 +213,34 @@ void CAdDlg::OnBnClickedOk()
 
 	m_ad.m_type = m_comboType.GetCurSel() + 1;
 	m_ad.m_imageAlign = m_comboImageAlign.GetCurSel() + 1;
-	m_ad.m_bHorizon = !(m_checkVerShow.GetCheck() == BST_CHECKED);
-	m_ad.m_textAlign = m_comboTextAlign.GetCurSel() + 1;
+	m_ad.m_bHorizon = !(m_checkVerShow.GetCheck() == BST_CHECKED);	
 	m_comboFont.GetWindowText(text);
 	m_ad.m_fontName = text;
-	if (m_ad.m_bHorizon)
+	
+	if (m_comboTextAlign.GetCurSel() == 0)
 	{
-		if (m_ad.m_textAlign != AD_ALIGN_LEFT && m_ad.m_textAlign != AD_ALIGN_RIGHT && m_ad.m_textAlign != AD_ALIGN_CENTER)
-		{
-			MessageBox(L"文字水平显示，请选择左对齐或右对齐或居中", L"提示", MB_OK);
-			return;
-		}
+		m_ad.m_textAlign = AD_ALIGN_CENTER;
 	}
-	else
+	else if (m_comboTextAlign.GetCurSel() == 1)
 	{
-		if (m_ad.m_textAlign != AD_ALIGN_TOP && m_ad.m_textAlign != AD_ALIGN_BOTTOM && m_ad.m_textAlign != AD_ALIGN_CENTER)
-		{
-			MessageBox(L"文字垂直显示，请选择上对齐或下对齐或居中", L"提示", MB_OK);
-			return;
-		}
+		m_ad.m_textAlign = AD_ALIGN_LEFT;
+	}
+	else if (m_comboTextAlign.GetCurSel() == 2)
+	{
+		m_ad.m_textAlign = AD_ALIGN_RIGHT;
+	}
+
+	if (m_comboVerAlign.GetCurSel() == 0)
+	{
+		m_ad.m_textVerAlign = AD_ALIGN_CENTER;
+	}
+	else if (m_comboVerAlign.GetCurSel() == 1)
+	{
+		m_ad.m_textVerAlign = AD_ALIGN_TOP;
+	}
+	else if (m_comboVerAlign.GetCurSel() == 2)
+	{
+		m_ad.m_textVerAlign = AD_ALIGN_BOTTOM;
 	}
 
 	m_editR.GetWindowText(text);
