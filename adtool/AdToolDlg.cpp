@@ -432,6 +432,9 @@ BOOL CAdToolDlg::OnInitDialog()
 	ChangeWindowMessageFilter(WM_DROPFILES, MSGFLT_ADD);
 	ChangeWindowMessageFilter(0x0049, MSGFLT_ADD); // 0x0049 == WM_COPYGLOBALDATA		
 
+	// 初始化渲染DC
+	CTemplateRender::SetHDC(::GetDC(NULL));
+
 	// 获取初始大小
 	CRect wndRect;
 	GetClientRect(&wndRect);

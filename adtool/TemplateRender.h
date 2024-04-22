@@ -28,6 +28,9 @@ public:
 	// 按比例缩放图片
 	static HBITMAP ScaleBitmap(HBITMAP bitmap, float scaleFactor);
 
+	// 主线程GetDC()设置给它
+	static void SetHDC(HDC hdc) { m_hdc = hdc; }
+
 private:
 	static void PaintAdRect(Gdiplus::Graphics& graphics, const CAdItem& ad);
 

@@ -8,7 +8,8 @@ HBITMAP CTemplateRender::Do(const CTemplateItem& tempItem, const CAdSettingItem 
 {  
     if (m_hdc == NULL)
     {
-        m_hdc = GetDC(NULL);
+        LOG_ERROR(L"dc is null");
+        return NULL;
     }
 
     // Load the original image
