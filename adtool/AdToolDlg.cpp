@@ -634,14 +634,6 @@ void CAdToolDlg::OnDropFiles(HDROP hDropInfo)
 
 void CAdToolDlg::OnBnClickedGenImageBtn()
 {
-	CTime now = CTime::GetCurrentTime();
-	CTime expired(2024, 5, 5, 0, 0, 0);
-	if (now >= expired)
-	{
-		MessageBox(L"数据有误", L"提示", MB_OK);
-		return;
-	}
-
 	CString groupName;
 	m_groupCombo.GetWindowText(groupName);
 	if (groupName.IsEmpty())
